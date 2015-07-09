@@ -26,3 +26,10 @@
 *.exe
 *.out
 *.app
+
+# Build directory
+build
+
+# External caches
+extern/jsoncpp/jsoncpp*
+extern/mongoose/mongoose*

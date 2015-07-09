@@ -38,7 +38,7 @@ if ( NOT DEFINED(MONGOOSE_LIBRARIES) OR NOT DEFINED(MONGOOSE_INCLUDE_DIRS) )
 
 	# Log
 	set( MONGOOSE_MODE "LOCAL" )
-	message( STATUS "Using Mongoose shipped with libcernvm")
+	message( STATUS "Using Mongoose shipped with library")
 
 else()
 	message( STATUS "Using Mongoose from: ${MONGOOSE_INCLUDE_DIRS}")
@@ -57,7 +57,7 @@ if ( NOT DEFINED(JSONCPP_LIBRARIES) OR NOT DEFINED(JSONCPP_INCLUDE_DIRS) )
 
 	# Log
 	set( JSONCPP_MODE "LOCAL" )
-	message( STATUS "Using JsonCPP shipped with libcernvm")
+	message( STATUS "Using JsonCPP shipped with library")
 
 else()
 	message( STATUS "Using JsonCPP from: ${JSONCPP_INCLUDE_DIRS}")
