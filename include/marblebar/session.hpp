@@ -37,13 +37,33 @@ namespace mb {
 	/**
 	 * Session instance class
 	 */
-	class Session : private enable_shared_from_this<Session>, public WebserverConnection {
+	class Session : public enable_shared_from_this<Session>, public WebserverConnection {
 	public:
 
 		/**
 		 * Initialize a MarbleBar Session
 		 */
 		Session( KernelPtr kernel, const string& domain, const string uri );
+
+		/**
+		 * Notify to session the fact that a view is added
+		 */
+		void 					notifyViewAdded( ViewPtr view );
+
+		/**
+		 * Notify to session the fact that a view is removed
+		 */
+		void 					notifyViewRemoved( ViewPtr view );
+
+		/**
+		 * Notify to session the fact that a view is updated
+		 */
+		void 					notifyViewUpdated( ViewPtr view );
+
+		/**
+		 * Notify to session the fact that a view property is changed
+		 */
+		void 					notifyViewPropertyUpdate( ViewPtr view, PropertyPtr property );
 
 	protected:
 

@@ -18,53 +18,34 @@
  * Contact: <ioannis.charalampidis[at]cern.ch>
  */
 
-#ifndef _MARBLEBAR_CONFIG_HPP_
-#define _MARBLEBAR_CONFIG_HPP_
+#include "marblebar/property.hpp"
+using namespace mb;
 
-#include <string>
-#include <memory>
- 
-using namespace std;
+/**
+ * Property constructor
+ */
+Property::Property()
+ : attached(false), id("")
+{ }
 
-namespace mb {
+/**
+ * Marblebar Property constructor
+ */
+void Property::attach( const ViewPtr & view, const string& id )
+{
+	this->view = view;
+	this->id = id;
+	this->attached = true;
+}
 
-	// Forward declarations
-	class Config;
-	typedef std::shared_ptr<Config> 	ConfigPtr;
-	typedef std::weak_ptr<Config> 		ConfigWeakPtr;
+/**
+ * Mark property as dirty
+ */
+void Property::markAsDirty() 
+{
+	// Do not do anything unless attached
+	if (!this->attached) return;
 
-	/**
-	 * Return a default config instance
-	 */
-	inline ConfigPtr defaultConfig()
-		{ return std::make_shared<Config>(); };
-
-	/**
-	 * Configuration class
-	 */
-	class Config {
-	public:
-
-		/**
-		 * Intiialize MarbleBar config
-		 */
-		Config()
-			: webserverPort( 15234 )
-		{ }
-
-		/**
-		 * The server version
-		 */
-		const string version 	= "0.0.1";
-
-		/**
-		 * The port to listen at
-		 */
-		int webserverPort;
-
-	};
-
-};
-
-
-#endif /* _MARBLEBAR_CONFIG_HPP_ */
+	// Notify view that I am dirty
+	view->markPropertyAsDirty( shared_from_this() );
+}

@@ -33,7 +33,8 @@ extern const char *find_embedded_file(const string&, size_t *);
 /**
  * Send an error message
  */
-int send_error( struct mg_connection *conn, const char* message, const int code = 500 ) {
+int send_error( struct mg_connection *conn, const char* message, const int code = 500 ) 
+{
 
     // Send error code
     mg_send_status(conn, code);
@@ -52,7 +53,8 @@ int send_error( struct mg_connection *conn, const char* message, const int code 
 /**
  * This is the entry point for the CernVM Web API I/O
  */
-int Webserver::api_handler(struct mg_connection *conn) {
+int Webserver::api_handler(struct mg_connection *conn) 
+{
 
 	// Fetch 'this' from the connection server object
 	Webserver* self = static_cast<Webserver*>(conn->server_param);
@@ -145,7 +147,8 @@ int Webserver::api_handler(struct mg_connection *conn) {
 /**
  * Iterator over the websocket connections
  */
-int Webserver::iterate_callback(struct mg_connection *conn, enum mg_event ev) {
+int Webserver::iterate_callback(struct mg_connection *conn, enum mg_event ev) 
+{
 
     // Fetch 'this' from the connection server object
     Webserver* self = static_cast<Webserver*>(conn->server_param);
@@ -193,7 +196,8 @@ int Webserver::iterate_callback(struct mg_connection *conn, enum mg_event ev) {
 /**
  * RAW Request handler
  */
-int Webserver::ev_handler(struct mg_connection *conn, enum mg_event ev) {
+int Webserver::ev_handler(struct mg_connection *conn, enum mg_event ev) 
+{
     if (ev == MG_REQUEST) {
         return api_handler(conn);
     } else if (ev == MG_AUTH) {
@@ -207,7 +211,8 @@ int Webserver::ev_handler(struct mg_connection *conn, enum mg_event ev) {
  * Create a webserver and setup listening port
  */
 Webserver::Webserver( ConfigPtr config ) 
-    : config(config), staticResources(), connections() {
+    : config(config), staticResources(), connections() 
+{
 
 	// Create a mongoose server, passing the pointer
 	// of this class, in order for the C callbacks
@@ -223,7 +228,8 @@ Webserver::Webserver( ConfigPtr config )
 /**
  * WebServer destructor
  */
-Webserver::~Webserver() {
+Webserver::~Webserver() 
+{
 
     // Destroy mongoose server
     mg_destroy_server( &server );
@@ -248,7 +254,8 @@ Webserver::~Webserver() {
 /**
  * Serve a static resource under the given URL
  */
-void Webserver::serve_static( const std::string& url, const std::string& file ) {
+void Webserver::serve_static( const std::string& url, const std::string& file ) 
+{
 
     // Store on staticResources
     staticResources[url] = file;
@@ -259,7 +266,8 @@ void Webserver::serve_static( const std::string& url, const std::string& file ) 
  * Poll server for incoming events. 
  * This function should be called periodically to receive events.
  */
-void Webserver::poll( const int timeout) {
+void Webserver::poll( const int timeout) 
+{
 
     // Mark all the connections as 'not iterated'
     {
@@ -313,7 +321,8 @@ void Webserver::poll( const int timeout) {
  * After calling this function the only way to stop the server is
  * an interrupt signal or to call ``stop`` function from another thread.
  */
-void Webserver::start() {
+void Webserver::start() 
+{
 
 	// Infinite loop :P
 	for (;;) {
@@ -325,7 +334,8 @@ void Webserver::start() {
 /**
  * Check if there are live registered connections
  */
-bool Webserver::hasLiveConnections() {
+bool Webserver::hasLiveConnections() 
+{
     unique_lock<mutex> objectLock(connMutex, std::try_to_lock);
     return !connections.empty();
 }

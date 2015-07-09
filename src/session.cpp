@@ -31,8 +31,123 @@ Session::Session( KernelPtr kernel, const string& domain, const string uri ) :
 }
 
 /**
+ * Notify to session the fact that a view is added
+ */
+void Session::notifyViewAdded( ViewPtr view )
+{
+	// Trigger view add
+	sendAction( "view/add", view->getUISpecs() );
+}
+
+/**
+ * Notify to session the fact that a view is removed
+ */
+void Session::notifyViewRemoved( ViewPtr view )
+{
+	Json::Value data;
+	data["id"] = view->id;
+	// Trigger view remove
+	sendAction( "view/remove", data );
+}
+
+/**
+ * Notify to session the fact that a view is updated
+ */
+void Session::notifyViewUpdated( ViewPtr view )
+{
+	// Trigger view update
+	sendAction( "view/update", view->getUISpecs() );
+}
+
+/**
+ * Notify to session the fact that a view property is changed
+ */
+void Session::notifyViewPropertyUpdate( ViewPtr view, PropertyPtr property )
+{
+	Json::Value data;
+	data["id"] = view->id;
+	data["prop"] = property->id;
+	data["value"] = property->getUIValue();
+
+	// Trigger view property change
+	sendAction( "view/propchange", data );
+}
+
+/**
  * Javascript event handler
  */
-void Session::handleEvent( const string& id, const string& event, const Json::Value& data ) {
+void Session::handleEvent( const string& id, const string& event, const Json::Value& data )
+{
 	
+	if (event == "ui/init") {
+
+		// Initialize the UI by sending all the view specifications
+		for (auto it = kernel->views.begin(); it != kernel->views.end(); ++it)
+			this->notifyViewAdded( *it );
+
+	} else if (event == "property/event") {
+
+	    // Ensure we have an action defined
+	    if (!data.isMember("view")) {
+	        sendError("Missing 'view' parameter in the incoming request", id);
+	        return;
+	    }
+	    if (!data.isMember("prop")) {
+	        sendError("Missing 'prop' parameter in the incoming request", id);
+	        return;
+	    }
+	    if (!data.isMember("name")) {
+	        sendError("Missing 'name' parameter in the incoming request", id);
+	        return;
+	    }
+	    if (!data.isMember("data")) {
+	        sendError("Missing 'data' parameter in the incoming request", id);
+	        return;
+	    }
+	    // Fetch view and property id
+	    string viewName = data["view"].asString();
+	    string propName = data["prop"].asString();
+	    string event = data["name"].asString();
+
+		// Locate a view with the specified ID
+		for (auto it = kernel->views.begin(); it != kernel->views.end(); ++it) {
+			ViewPtr view = *it;
+
+			// Find view
+			if (view->id == viewName) {
+
+				// Locate property with specified ID
+				for (auto jt = view->properties.begin(); jt != view->properties.end(); jt++) {
+					PropertyPtr prop = *jt;
+
+					// Find property
+					if (prop->id == propName) {
+
+						// Handle event by the property
+						prop->handleUIEvent( event, data["data"] );
+
+						// Do not continue
+						return;
+
+					}
+
+				}
+
+				// Property not found
+				sendError("Specified property was not found", id);
+				return;
+			}
+
+		}
+
+		// View not found
+		sendError("Specified view was not found", id);
+
+	} else {
+
+		// Send error
+		sendError("Unknown event received", id);
+
+	}
+
 }

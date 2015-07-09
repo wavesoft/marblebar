@@ -25,7 +25,7 @@ using namespace mb;
  * Marblebar View constructor
  */
 View::View() : 
-	properties()
+	attached(false), id(""), properties()
 {
 
 }
@@ -33,7 +33,23 @@ View::View() :
 /**
  * Marblebar View constructor
  */
-ViewPtr View::addProperty( PropertyPtr property ) {
+void View::attach( const KernelPtr& kernel, const string& id )
+{
+	this->kernel = kernel;
+	this->id = id;
+	this->attached = true;
+}
+
+/**
+ * Marblebar View constructor
+ */
+ViewPtr View::addProperty( PropertyPtr property )
+{
+	// Do not do anything unless attached
+	if (!this->attached) return shared_from_this();
+
+	// Attach property to me
+	property->attach( shared_from_this(), "" );
 
 	// Keep property
 	properties.push_back( property );
@@ -41,4 +57,39 @@ ViewPtr View::addProperty( PropertyPtr property ) {
 	// Return instance for chain-calling
 	return shared_from_this();
 
+}
+
+/**
+ * Mark property as dirty
+ */
+void View::markPropertyAsDirty( const PropertyPtr & property )
+{
+	// Do not do anything unless attached
+	if (!this->attached) return;
+
+	// Broadcast to the kerne
+	kernel->broadcastViewPropertyUpdate( shared_from_this(), property );
+
+}
+
+/**
+ * Get view UI specifications
+ */
+Json::Value View::getUISpecs()
+{
+	// Do not do anything unless attached
+	if (!this->attached) return Json::Value();
+
+	// Get View ID
+	Json::Value value, prop;
+	value["id"] = id;
+
+	// Iterate over properties and collect specs
+	for (auto it = properties.begin(); it != properties.end(); ++it) {
+		prop.append( (*it)->getUISpecs() );
+	}
+	value["properties"] = prop;
+
+	// Return specifications
+	return value;
 }

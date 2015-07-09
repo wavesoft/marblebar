@@ -18,8 +18,8 @@
  * Contact: <ioannis.charalampidis[at]cern.ch>
  */
 
-#ifndef _MARBLEBAR_PROPERTY_HPP_
-#define _MARBLEBAR_PROPERTY_HPP_
+#ifndef _MARBLEBAR_PROP_STRING_HPP_
+#define _MARBLEBAR_PROP_STRING_HPP_
 
 #include <json/json.h>
 #include <string>
@@ -43,38 +43,28 @@ namespace mb {
 	/**
 	 * Property base class from which widgets can derrive
 	 */
-	class Property : public enable_shared_from_this<Property> {
+	class PString : public Property {
 	public:
 
 		/**
-		 * Property constructor
+		 * Initialize a MarbleBar property
 		 */
-		Property();
-
-		/**
-		 * Attach to a view
-		 */
-		void 				attach( const ViewPtr & view, const string& id );
-
-		/**
-		 * Mark property value as dirty
-		 */
-		void				markAsDirty();
+		PString();
 
 		/**
 		 * Overridable function to apply a property change to it's contents
 		 */
-		virtual void 		handleUIEvent( const string & event, const Json::Value & data ) = 0;
+		virtual void 		handleUIEvent( const string & event, const Json::Value & data );
 
 		/**
 		 * Overridable function to render the property value to a JSON value
 		 */
-		virtual Json::Value getUIValue() = 0;
+		virtual Json::Value getUIValue();
 
 		/**
 		 * Overridable function to return property specifications for the js UI
 		 */
-		virtual Json::Value getUISpecs() = 0;
+		virtual Json::Value getUISpecs();
 
 	public:
 
@@ -88,16 +78,9 @@ namespace mb {
 		 */
 		ViewPtr			view;
 
-	protected:
-
-		/**
-		 * Flag if this view is attached
-		 */
-		bool 			attached;
-
 	};
 
 };
 
 
-#endif /* _MARBLEBAR_PROPERTY_HPP_ */
+#endif /* _MARBLEBAR_PROP_STRING_HPP_ */

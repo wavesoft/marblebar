@@ -18,53 +18,27 @@
  * Contact: <ioannis.charalampidis[at]cern.ch>
  */
 
-#ifndef _MARBLEBAR_CONFIG_HPP_
-#define _MARBLEBAR_CONFIG_HPP_
+#import <Cocoa/Cocoa.h>
+#include <sstream>
+#include "marblebar/platform.hpp"
 
-#include <string>
-#include <memory>
- 
-using namespace std;
+using namespace mb;
 
-namespace mb {
+/**
+ * Open the platform webbrowser pointing to the GUI
+ */
+void openGUIURL( ConfigPtr config )
+{
 
-	// Forward declarations
-	class Config;
-	typedef std::shared_ptr<Config> 	ConfigPtr;
-	typedef std::weak_ptr<Config> 		ConfigWeakPtr;
+	// Calculate url to visit
+	ostringstream oss;
+	oss << "http://127.0.0.1:" << config->webserverPort << "/gui.html";
 
-	/**
-	 * Return a default config instance
-	 */
-	inline ConfigPtr defaultConfig()
-		{ return std::make_shared<Config>(); };
+	// Open again the management interface
+	[[NSWorkspace sharedWorkspace] 
+		openURL:[NSURL 
+			URLWithString:[NSString stringWithCString:oss.str().c_str() encoding:[NSString defaultCStringEncoding]]
+		]
+	]; 
 
-	/**
-	 * Configuration class
-	 */
-	class Config {
-	public:
-
-		/**
-		 * Intiialize MarbleBar config
-		 */
-		Config()
-			: webserverPort( 15234 )
-		{ }
-
-		/**
-		 * The server version
-		 */
-		const string version 	= "0.0.1";
-
-		/**
-		 * The port to listen at
-		 */
-		int webserverPort;
-
-	};
-
-};
-
-
-#endif /* _MARBLEBAR_CONFIG_HPP_ */
+}

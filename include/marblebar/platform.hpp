@@ -18,53 +18,19 @@
  * Contact: <ioannis.charalampidis[at]cern.ch>
  */
 
-#ifndef _MARBLEBAR_CONFIG_HPP_
-#define _MARBLEBAR_CONFIG_HPP_
+#ifndef _MARBLEBAR_PLATFORM_HPP_
+#define _MARBLEBAR_PLATFORM_HPP_
 
-#include <string>
-#include <memory>
- 
-using namespace std;
+#include <marblebar/config.hpp>
 
 namespace mb {
 
-	// Forward declarations
-	class Config;
-	typedef std::shared_ptr<Config> 	ConfigPtr;
-	typedef std::weak_ptr<Config> 		ConfigWeakPtr;
-
 	/**
-	 * Return a default config instance
+	 * Open the platform webbrowser pointing to the GUI
 	 */
-	inline ConfigPtr defaultConfig()
-		{ return std::make_shared<Config>(); };
+	void		openGUIURL( ConfigPtr config );
 
-	/**
-	 * Configuration class
-	 */
-	class Config {
-	public:
-
-		/**
-		 * Intiialize MarbleBar config
-		 */
-		Config()
-			: webserverPort( 15234 )
-		{ }
-
-		/**
-		 * The server version
-		 */
-		const string version 	= "0.0.1";
-
-		/**
-		 * The port to listen at
-		 */
-		int webserverPort;
-
-	};
-
-};
+}
 
 
-#endif /* _MARBLEBAR_CONFIG_HPP_ */
+#endif /* _MARBLEBAR_PLATFORM_HPP_ */

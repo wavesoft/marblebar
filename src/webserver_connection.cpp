@@ -35,7 +35,8 @@ WebserverConnection::WebserverConnection( const string& domain, const string uri
 /**
  * Handle incoming raw request from the browser
  */
-void WebserverConnection::handleRawData( const char * buf, const size_t len ) {
+void WebserverConnection::handleRawData( const char * buf, const size_t len ) 
+{
 
     // Parse the incoming buffer as JSON
     Json::Value root;
@@ -81,7 +82,8 @@ void WebserverConnection::handleRawData( const char * buf, const size_t len ) {
 /**
  * Return the next available egress packet
  */
-string WebserverConnection::getEgressRawData() {
+string WebserverConnection::getEgressRawData() 
+{
     // Return empty string if the queue is empty
     if (egress.empty())
         return "";
@@ -95,7 +97,8 @@ string WebserverConnection::getEgressRawData() {
 /**
  * Send a raw response to the server
  */
-void WebserverConnection::sendRawData( const string& data ) {
+void WebserverConnection::sendRawData( const string& data ) 
+{
     // Add data to the egress queue
     egress.push(data);
 }
@@ -103,7 +106,8 @@ void WebserverConnection::sendRawData( const string& data ) {
 /**
  * Send error response
  */
-void WebserverConnection::sendError( const string& error, const string& id ) {
+void WebserverConnection::sendError( const string& error, const string& id ) 
+{
     // Build and send an error response
     ostringstream oss;
     oss << "{\"type\":\"error\",";
@@ -116,7 +120,8 @@ void WebserverConnection::sendError( const string& error, const string& id ) {
 /**
  * Send a json-formatted action response
  */
-void WebserverConnection::reply( const string& id, const Json::Value& data ) {
+void WebserverConnection::reply( const string& id, const Json::Value& data ) 
+{
 
     // Build and send an action response
     Json::FastWriter writer;
@@ -136,7 +141,8 @@ void WebserverConnection::reply( const string& id, const Json::Value& data ) {
 /**
  * Send a json-formatted action response
  */
-void WebserverConnection::sendAction( const string& event, const Json::Value& data, const string& id ) {
+void WebserverConnection::sendAction( const string& event, const Json::Value& data, const string& id ) 
+{
 
     // Build and send an action response
     Json::FastWriter writer;
@@ -151,4 +157,19 @@ void WebserverConnection::sendAction( const string& event, const Json::Value& da
     // Compile JSON response
     string jsonResponse = writer.write(root);
     sendRawData( jsonResponse );
+}
+
+/**
+ * Check if the socket is connected
+ */
+bool WebserverConnection::isConnected()
+{
+    return true;
+}
+
+/**
+ * Cleanup sequence
+ */
+void WebserverConnection::cleanup()
+{
 }

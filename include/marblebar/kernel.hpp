@@ -25,7 +25,6 @@
 #include <map>
 #include <vector>
 #include <marblebar/config.hpp>
-#include <marblebar/view.hpp>
 #include <marblebar/server/webserver.hpp>
 
 using namespace std;
@@ -38,9 +37,23 @@ namespace mb {
 	typedef std::weak_ptr<Kernel> 		KernelWeakPtr;
 
 	/**
+	 * Return a default config instance
+	 */
+	inline KernelPtr createKernel( ConfigPtr config )
+		{ return std::make_shared<Kernel>( config ); };
+
+}
+
+// view.hpp depends on us, so we should define pointers first
+#include <marblebar/view.hpp>
+#include <marblebar/property.hpp>
+
+namespace mb {
+	
+	/**
 	 * Configuration class
 	 */
-	class Kernel : private enable_shared_from_this<Kernel>, public Webserver {
+	class Kernel : public enable_shared_from_this<Kernel>, public Webserver {
 	public:
 
 		/**
@@ -49,9 +62,39 @@ namespace mb {
 		Kernel( ConfigPtr config );
 
 		/**
+		 * Virtual destructor
+		 */
+		virtual ~Kernel();
+
+		/**
 		 * Add a view and return a chaining instance
 		 */
-		KernelPtr addView( ViewPtr config );
+		KernelPtr 					addView( ViewPtr config );
+
+		/**
+		 * Open browser and point to the GUI
+		 */
+		void 						openGUI();
+
+		/**
+		 * Broadcast to all session the fact that a view is added
+		 */
+		void 						broadcastViewAdded( ViewPtr view );
+
+		/**
+		 * Broadcast to all session the fact that a view is removed
+		 */
+		void 						broadcastViewRemoved( ViewPtr view );
+
+		/**
+		 * Broadcast to all session the fact that a view is updated
+		 */
+		void 						broadcastViewUpdated( ViewPtr view );
+
+		/**
+		 * Broadcast to all session the fact that a view property is changed
+		 */
+		void 						broadcastViewPropertyUpdate( ViewPtr view, PropertyPtr property );
 
 	protected:
 
@@ -60,17 +103,19 @@ namespace mb {
 		 */
 		virtual WebserverConnectionPtr openConnection( const std::string& domain, const std::string uri );
 
+	public:
+
+		/**
+		 * Views registered in the kernel
+		 */
+		vector< ViewPtr >			views;
+
 	private:
 
 		/**
 		 * Kernel configuration
 		 */
 		ConfigPtr 					config;
-
-		/**
-		 * Views registered in the kernel
-		 */
-		vector< ViewPtr >			views;
 
 		/**
 		 * Kernel state 

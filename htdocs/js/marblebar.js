@@ -240,8 +240,8 @@
 
 			if (action == 'view/add') {
 				self.addView( data['id'], data['specs'] );
-			} else if (action == 'view/delete') {
-				self.delView( data['id'] );
+			} else if (action == 'view/remove') {
+				self.remView( data['id'] );
 			} else if (action == 'view/propchange') {
 				self.setViewProperty( data['id'], data['prop'], data['value'] );
 			}
@@ -261,9 +261,9 @@
 	}
 
 	/**
-	 * Delete a MarbleBar View
+	 * Remove a MarbleBar View
 	 */
-	MarbleGUI.prototype.delView = function( id ) {
+	MarbleGUI.prototype.remView = function( id ) {
 
 	}
 

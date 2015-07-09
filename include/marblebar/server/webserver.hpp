@@ -88,6 +88,10 @@ namespace mb {
 		 */
 		virtual WebserverConnectionPtr openConnection( const string& domain, const string uri ) = 0;
 
+		/**
+		 * A list of active webserver connections
+		 */
+		map<mg_connection*, WebserverConnectionPtr>		connections;
 
 	private:
 
@@ -95,11 +99,6 @@ namespace mb {
 		 * Configuration details
 		 */
 		ConfigPtr 										config;
-
-		/**
-		 * A list of active webserver connections
-		 */
-		map<mg_connection*, WebserverConnectionPtr>		connections;
 
 		/**
 		 * Mutex for accessing the connections array
@@ -114,7 +113,7 @@ namespace mb {
 		/**
 		 * Map of static resources
 		 */
-		map< string, string > 			staticResources;
+		map< string, string > 							staticResources;
 
 		/**
 		 * Iterator over the websocket connections

@@ -23,7 +23,7 @@
 
 #include <memory>
 #include <vector>
-#include <marblebar/property.hpp>
+#include <json/json.h>
 
 using namespace std;
 
@@ -33,11 +33,18 @@ namespace mb {
 	class View;
 	typedef std::shared_ptr<View> 	ViewPtr;
 	typedef std::weak_ptr<View> 	ViewWeakPtr;
+}
 
+// property.hpp & kernel.hpp depends on us, so we should define pointers first
+#include <marblebar/property.hpp>
+#include <marblebar/kernel.hpp>
+
+namespace mb {
+	
 	/**
 	 * MarbleBar View
 	 */
-	class View : private enable_shared_from_this<View> {
+	class View : public enable_shared_from_this<View> {
 	public:
 
 		/**
@@ -46,16 +53,48 @@ namespace mb {
 		View();
 
 		/**
+		 * Attach to a kernel
+		 */
+		void 						attach( const KernelPtr& kernel, const string & id );
+
+		/**
 		 * Add a property
 		 */
-		ViewPtr addProperty( PropertyPtr property );
+		ViewPtr 					addProperty( PropertyPtr property );
 
-	private:
-		
+		/**
+		 * Mark a particular property as dirty
+		 */
+		void 						markPropertyAsDirty( const PropertyPtr& property );
+
+		/**
+		 * Get view UI specifications
+		 */
+		Json::Value					getUISpecs();
+
+	public:
+
+		/**
+		 * The unique session ID for this instance
+		 */
+		string 						id;
+
 		/**
 		 * List of properties
 		 */
 		vector< PropertyPtr >		properties;
+		
+		/**
+		 * The kernel that hosts the property
+		 */
+		KernelPtr					kernel;
+
+	private:
+
+		/**
+		 * Flag if this view is attached
+		 */
+		bool 						attached;
 
 	};
 
