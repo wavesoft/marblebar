@@ -23,6 +23,7 @@
 
 #include <memory>
 #include <marblebar/kernel.hpp>
+#include <marblebar/server/webserver_connection.hpp>
 
 using namespace std;
 
@@ -36,13 +37,20 @@ namespace mb {
 	/**
 	 * Session instance class
 	 */
-	class Session {
+	class Session : private enable_shared_from_this<Session>, public WebserverConnection {
 	public:
 
 		/**
 		 * Initialize a MarbleBar Session
 		 */
-		Session( KernelPtr kernel );
+		Session( KernelPtr kernel, const string& domain, const string uri );
+
+	protected:
+
+		/**
+		 * Javascript event handler
+		 */
+		virtual void 			handleEvent( const string& id, const string& event, const Json::Value& data );
 
 	private:
 

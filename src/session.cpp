@@ -24,9 +24,15 @@ using namespace mb;
 /**
  * Marblebar Session constructor
  */
-Session::Session( KernelPtr kernel ) : 
-	kernel(kernel)
+Session::Session( KernelPtr kernel, const string& domain, const string uri ) : 
+	kernel(kernel), WebserverConnection( domain, uri )
 {
 
 }
 
+/**
+ * Javascript event handler
+ */
+void Session::handleEvent( const string& id, const string& event, const Json::Value& data ) {
+	
+}
