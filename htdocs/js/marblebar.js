@@ -3,7 +3,7 @@
 	/**
 	 * Where to find marblebar server
 	 */
-	var WS_ENDPOINT = "127.0.0.1:15234";
+	var WS_ENDPOINT = "ws://127.0.0.1:15234/";
 
 	////////////////////////////////////////////////
 	// MarbleBar CORE API
@@ -294,15 +294,10 @@
 	////////////////////////////////////////////////
 	// Initialization Hook
 	////////////////////////////////////////////////
-
-	// When page is loaded, initialize Marblebar GUI
-	$(function() {
-		
-		// Create a marblebar GUI API instance
-		window.marblebar = new MarbleGUI($("#mb-gui"));
-		// Connect and initialize
-		window.marblebar.connect();
-
-	});
+	
+	// Create a marblebar GUI API instance
+	window.marblebar = new MarbleGUI($("#mb-gui"));
+	// Connect and initialize
+	window.marblebar.connect();
 
 })();

@@ -27,7 +27,7 @@ using namespace mb;
 /**
  * Open the platform webbrowser pointing to the GUI
  */
-void openGUIURL( ConfigPtr config )
+void mb::openGUIURL( ConfigPtr config )
 {
 
 	// Calculate url to visit

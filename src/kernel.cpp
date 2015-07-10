@@ -27,17 +27,13 @@ using namespace mb;
  * Marblebar kernel constructor
  */
 Kernel::Kernel( ConfigPtr config ) : Webserver(config), config(config) 
-{
-
-}
+{ }
 
 /**
  * Marblebar kernel destructor
  */
 Kernel::~Kernel()
-{
-
-}
+{ }
 
 /**
  * Add a view in the marblebar kernel

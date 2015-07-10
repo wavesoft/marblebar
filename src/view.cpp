@@ -26,9 +26,7 @@ using namespace mb;
  */
 View::View() : 
 	attached(false), id(""), properties()
-{
-
-}
+{ }
 
 /**
  * Marblebar View constructor

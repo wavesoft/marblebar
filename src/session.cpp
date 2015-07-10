@@ -26,9 +26,7 @@ using namespace mb;
  */
 Session::Session( KernelPtr kernel, const string& domain, const string uri ) : 
 	kernel(kernel), WebserverConnection( domain, uri )
-{
-
-}
+{ }
 
 /**
  * Notify to session the fact that a view is added
