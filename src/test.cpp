@@ -14,7 +14,7 @@ int main(int argc, char ** argv) {
 	PStringPtr p2 = view->addProperty( make_shared<PString>("Second Value", "value") );
 	PBoolPtr p3 = view->addProperty( make_shared<PBool>("Toggler", false) );
 	PIntPtr p4 = view->addProperty( make_shared<PInt>("Range", 0) );
-
+	PImagePtr p5 = view->addProperty( make_shared<PImage>("Preview", 128, -1, "about:blank") );
 
 	*p1 = "test";
 	*p1 += "ing";

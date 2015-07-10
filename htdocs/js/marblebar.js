@@ -174,6 +174,33 @@ $(function() {
 
 	});
 
+	/**
+	 * [image] An image widget for rendering images (duh!)
+	 */
+	Widgets['image'] = Widget.create(function( hostDOM, specs ) {
+
+		// Initialize widget
+		var id = new_id();
+		this.label = $('<label class="col-sm-2 control-label" for="'+id+'"></label>').text( specs['meta']['title'] ).appendTo( hostDOM );
+		this.img = $('<img id="'+id+'" src="" />').appendTo(
+			$('<div class="well well-sm"></div>').appendTo(
+				$('<div class="col-sm-10"></div>').appendTo(hostDOM)
+			)
+		);
+
+		// Apply width/height if defined
+		if (specs.meta.width >= 0)
+			this.img.attr("width", specs.meta.width);
+		if (specs.meta.height >= 0)
+			this.img.attr("height", specs.meta.height);
+
+		// Handle property update
+		this.update = function( value ) {
+			this.img.attr('src', value);
+		}
+
+	});
+
 	////////////////////////////////////////////////
 	// View Interface
 	////////////////////////////////////////////////
@@ -199,9 +226,6 @@ $(function() {
 
 		// Initialize property host
 		this.propertyDOM = $('<form class="form-horizontal"></form>').appendTo( this.bodyDOM );
-
-		// Activate tab
-		//$(this.bodyDOM).tab();
 
 		// Create properties
 		for (var i=0; i<specs.properties.length; i++) {
@@ -423,7 +447,6 @@ $(function() {
 	 */
 	Marblebar.prototype.connect = function( timeout ) {
 		var self = this;
-		this.log("[socket] Connecting");
 		try {
 			// Calculate timeout
 			if (!timeout) timeout=500;
@@ -442,7 +465,6 @@ $(function() {
 
 			// Setup websocket & callbacks
 			socket.onerror = function(e) {
-				self.log("[socket] Error connecting to socket");
 				console.warn("[socket] Error connecting to socket", e);
 				if (timedOut) return;
 				clearTimeout(timeoutCb);
@@ -452,24 +474,20 @@ $(function() {
 			};
 			socket.onopen = function(e) {
 				if (timedOut) return;
-				self.log("[socket] Connection open");
 				clearTimeout(timeoutCb);
 				self.socket = socket;
 				self.connected = true;
 				self.initGUI();
 			};
 			socket.onclose = function() {
-				self.log("[socket] Socket disconnected");
 				console.warn("[socket] Socket disconnected");
 				self.disconnect();
 			};
 			socket.onmessage = function(e) {
-				self.log("[socket] Incoming message");
 				self.__handleData( e.data );
 			};
 
 		} catch(e) {
-			this.log("[socket] Error setting up socket");
 			console.warn("[socket] Error setting up socket", e);
 			if (timedOut) return;
 			clearTimeout(timeoutCb);
@@ -509,19 +527,11 @@ $(function() {
 
 		// Initialize DOMs
 		this.hostDOM = $(hostDOM);
-		this.logDOM = this.hostDOM.find("#mb-console-log");
 
 	};
 
 	// Subclass from MarbleBar
 	MarbleGUI.prototype = Object.create( Marblebar.prototype );
-
-	/**
-	 * Log a message
-	 */
-	MarbleGUI.prototype.log = function( message ) {
-		$('<div></div>').text(message).appendTo(this.logDOM);
-	}
 
 	/**
 	 * Add a MarbleBar View
@@ -532,7 +542,14 @@ $(function() {
 
 		// Put on index
 		this.views.push(view);
-		this.viewIndex[id] = view;		
+		this.viewIndex[id] = view;
+
+		// Activate	view's tab dom if first
+		if (this.views.length == 1) {
+			view.tabDOM.tab('show');
+			view.bodyDOM.addClass("active");
+		}
+
 	}
 
 	/**
