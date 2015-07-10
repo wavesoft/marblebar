@@ -85,16 +85,6 @@ PString & PString::operator= ( const string & str )
 }
 
 /**
- * Copy-assign operator
- */
-PString & PString::operator= ( string str )
-{
-	this->value = str;
-	this->markAsDirty();
-	return *this;
-}
-
-/**
  * Assign operator
  */
 PString & PString::operator= ( const char* str )
@@ -105,30 +95,9 @@ PString & PString::operator= ( const char* str )
 }
 
 /**
- * Copy-assign operator
- */
-PString & PString::operator= ( char* str )
-{
-	this->value = str;
-	this->markAsDirty();
-	return *this;
-}
-
-
-/**
  * Assign operator
  */
 PString & PString::operator+= ( const string & str )
-{
-	this->value += str;
-	this->markAsDirty();
-	return *this;
-}
-
-/**
- * Copy-assign operator
- */
-PString & PString::operator+= ( string str )
 {
 	this->value += str;
 	this->markAsDirty();
@@ -144,14 +113,3 @@ PString & PString::operator+= ( const char* str )
 	this->markAsDirty();
 	return *this;
 }
-
-/**
- * Copy-assign operator
- */
-PString & PString::operator+= ( char* str )
-{
-	this->value += str;
-	this->markAsDirty();
-	return *this;
-}
-

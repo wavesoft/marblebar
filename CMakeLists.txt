@@ -162,7 +162,7 @@ if (APPLE)
 endif()
 
 # Add library target
-add_executable( 
+add_library( 
 	${PROJECT_NAME}
 	${PROJECT_SOURCES}
 	${PLATFORM_SOURCES}

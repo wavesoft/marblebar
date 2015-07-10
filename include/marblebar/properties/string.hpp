@@ -74,17 +74,13 @@ namespace mb {
 		 * Assign operator
 		 */
 		PString & operator= ( const string & str );
-		PString & operator= ( string str );
 		PString & operator= ( const char* str );
-		PString & operator= ( char* str );
 
 		/**
 		 * Append operator
 		 */
 		PString & operator+= ( const string & str );
-		PString & operator+= ( string str );
 		PString & operator+= ( const char* str );
-		PString & operator+= ( char* str );
 
 	private:
 
