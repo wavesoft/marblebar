@@ -144,6 +144,36 @@ $(function() {
 
 	});
 
+	/**
+	 * [slider] A slider widget for integer values
+	 */
+	Widgets['slider'] = Widget.create(function( hostDOM, specs ) {
+
+		// Initialize widget
+		var id = new_id();
+		this.label = $('<label class="col-sm-2 control-label" for="'+id+'"></label>').text( specs['meta']['title'] ).appendTo( hostDOM );
+		this.input = $('<input id="'+id+'" type="text" />').appendTo(
+			$('<div class="col-sm-10"></div>').appendTo(hostDOM)
+		);
+
+		// Create slider
+		$(this.input).slider({
+			'min': specs.meta.min || 0,
+			'max': specs.meta.max || 100,
+			'step': specs.meta.step || 1,
+			'value': specs.value
+		});
+		$(this.input).on("slide", (function(slideEvt) {
+			this.trigger("update", { "value": slideEvt.value });
+		}).bind(this));
+
+		// Handle property update
+		this.update = function( value ) {
+			this.input.slider('setValue', value);
+		}
+
+	});
+
 	////////////////////////////////////////////////
 	// View Interface
 	////////////////////////////////////////////////

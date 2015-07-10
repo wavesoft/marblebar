@@ -30,5 +30,6 @@
 
 #include <marblebar/properties/string.hpp>
 #include <marblebar/properties/bool.hpp>
+#include <marblebar/properties/int.hpp>
 
 #endif /* _MARBLEBAR_HPP_ */
