@@ -21,12 +21,14 @@
 #include "marblebar/kernel.hpp"
 #include "marblebar/session.hpp"
 #include "marblebar/platform.hpp"
+#include <sstream>
+
 using namespace mb;
 
 /**
  * Marblebar kernel constructor
  */
-Kernel::Kernel( ConfigPtr config ) : Webserver(config), config(config) 
+Kernel::Kernel( ConfigPtr config ) : Webserver(config), config(config), lastViewID(0)
 { }
 
 /**
@@ -40,16 +42,34 @@ Kernel::~Kernel()
  */
 KernelPtr Kernel::addView( ViewPtr view )
 {
-
 	// Keep view
 	views.push_back( view );
-
+	// Attach to the kernel
+	view->attach( shared_from_this(), getNextViewID() );
 	// Broadcast the fact that a view is added
 	this->broadcastViewAdded( view );
 
 	// Return instance for chain-calling
 	return shared_from_this();
+}
 
+/**
+ * Create and store a new view with the specified ID
+ */
+ViewPtr Kernel::createView( const string & title )
+{
+	// Create a shared view
+	ViewPtr view = make_shared<View>( title );
+
+	// Keep view
+	views.push_back( view );
+	// Attach to the kernel
+	view->attach( shared_from_this(), getNextViewID() );
+	// Broadcast the fact that a view is added
+	this->broadcastViewAdded( view );
+
+	// Return instance
+	return view;
 }
 
 /**
@@ -66,9 +86,15 @@ void Kernel::openGUI( )
  */
 void Kernel::broadcastViewAdded( ViewPtr view )
 {
+	// Ignore broadcasts originating from the current session
+	SessionPtr ignore;
+	if (activeConnection)
+		ignore = dynamic_pointer_cast<Session>(activeConnection);
+
 	// Forward to all connections
 	for (auto it = connections.begin(); it != connections.end(); ++it)
-		(dynamic_pointer_cast<Session>((*it).second))->notifyViewAdded( view );
+		if ((*it).second != ignore)
+			(dynamic_pointer_cast<Session>((*it).second))->notifyViewAdded( view );
 }
 
 /**
@@ -76,9 +102,15 @@ void Kernel::broadcastViewAdded( ViewPtr view )
  */
 void Kernel::broadcastViewRemoved( ViewPtr view )
 {
+	// Ignore broadcasts originating from the current session
+	SessionPtr ignore;
+	if (activeConnection)
+		ignore = dynamic_pointer_cast<Session>(activeConnection);
+
 	// Forward to all connections
 	for (auto it = connections.begin(); it != connections.end(); ++it)
-		(dynamic_pointer_cast<Session>((*it).second))->notifyViewRemoved( view );
+		if ((*it).second != ignore)
+			(dynamic_pointer_cast<Session>((*it).second))->notifyViewRemoved( view );
 }
 
 /**
@@ -86,9 +118,15 @@ void Kernel::broadcastViewRemoved( ViewPtr view )
  */
 void Kernel::broadcastViewUpdated( ViewPtr view )
 {
+	// Ignore broadcasts originating from the current session
+	SessionPtr ignore;
+	if (activeConnection)
+		ignore = dynamic_pointer_cast<Session>(activeConnection);
+
 	// Forward to all connections
 	for (auto it = connections.begin(); it != connections.end(); ++it)
-		(dynamic_pointer_cast<Session>((*it).second))->notifyViewUpdated( view );
+		if ((*it).second != ignore)
+			(dynamic_pointer_cast<Session>((*it).second))->notifyViewUpdated( view );
 }
 
 /**
@@ -96,9 +134,15 @@ void Kernel::broadcastViewUpdated( ViewPtr view )
  */
 void Kernel::broadcastViewPropertyUpdate( ViewPtr view, PropertyPtr property )
 {
+	// Ignore broadcasts originating from the current session
+	SessionPtr ignore;
+	if (activeConnection)
+		ignore = dynamic_pointer_cast<Session>(activeConnection);
+
 	// Forward to all connections
 	for (auto it = connections.begin(); it != connections.end(); ++it)
-		(dynamic_pointer_cast<Session>((*it).second))->notifyViewPropertyUpdate( view, property );
+		if ((*it).second != ignore)
+			(dynamic_pointer_cast<Session>((*it).second))->notifyViewPropertyUpdate( view, property );
 }
 
 /**
@@ -110,4 +154,16 @@ WebserverConnectionPtr Kernel::openConnection( const std::string& domain, const 
 	return dynamic_pointer_cast<WebserverConnection>(
 			make_shared<Session>( shared_from_this(), domain, uri )
 		);
+}
+
+/**
+ * Calculate and return the next view ID
+ */
+string Kernel::getNextViewID()
+{
+	// Compose view ID 
+	ostringstream oss;
+	oss << "v" << (++lastViewID);
+	// Return view-index
+	return oss.str();
 }

@@ -1,4 +1,4 @@
-/**
+ /**
  * This file is part of the MarbleBar Library.
  *
  * libMarbleBar is free software: you can redistribute it and/or modify
@@ -18,8 +18,8 @@
  * Contact: <ioannis.charalampidis[at]cern.ch>
  */
 
-#ifndef _MARBLEBAR_PROPERTY_HPP_
-#define _MARBLEBAR_PROPERTY_HPP_
+#ifndef _MARBLEBAR_PROP_STRING_HPP_
+#define _MARBLEBAR_PROP_STRING_HPP_
 
 #include <json/json.h>
 #include <string>
@@ -27,54 +27,36 @@
 
 using namespace std;
 
-namespace mb {
-
-	// Forward declarations
-	class Property;
-	typedef std::shared_ptr<Property> 	PropertyPtr;
-	typedef std::weak_ptr<Property> 	PropertyWeakPtr;
-}
-
 // view.hpp depends on us, so we should define pointers first
 #include <marblebar/view.hpp>
 
 namespace mb {
 
+	// Forward declarations
+	class PBool;
+	typedef std::shared_ptr<PBool> 	PBoolPtr;
+	typedef std::weak_ptr<PBool> 	PBoolWeakPtr;
+
 	/**
 	 * Property base class from which widgets can derrive
 	 */
-	class Property : public enable_shared_from_this<Property> {
+	class PBool : public Property {
 	public:
 
 		/**
-		 * Property constructor
+		 * Initialize a MarbleBar property
 		 */
-		Property();
-
-		/**
-		 * Attach to a view
-		 */
-		void 				attach( const ViewPtr& view, const string & id );
-
-		/**
-		 * Mark property value as dirty
-		 */
-		void				markAsDirty();
-
-		/**
-		 * Update a metadata field
-		 */
-		PropertyPtr 		meta( const string & property, const Json::Value & value );
+		PBool( const string & title, const bool & defaultValue = false);
 
 		/**
 		 * Overridable function to apply a property change to it's contents
 		 */
-		virtual void 		handleUIEvent( const string & event, const Json::Value & data ) = 0;
+		virtual void 		handleUIEvent( const string & event, const Json::Value & data );
 
 		/**
 		 * Overridable function to render the property value to a JSON value
 		 */
-		virtual Json::Value getUIValue() = 0;
+		virtual Json::Value getUIValue();
 
 		/**
 		 * Overridable function to return property specifications for the js UI
@@ -84,30 +66,26 @@ namespace mb {
 	public:
 
 		/**
-		 * The parent view
+		 * Static cast to string
 		 */
-		ViewPtr			view;
+		operator bool() const;
 
 		/**
-		 * Metatada information
+		 * Assign operator
 		 */
-		Json::Value 	metadata;
+		PBool & operator= ( const bool & str );
+		PBool & operator= ( bool str );
+
+	private:
 
 		/**
-		 * The view is ID
+		 * The internal property
 		 */
-		string 			id;
-
-	protected:
-
-		/**
-		 * Flag if this view is attached
-		 */
-		bool 			attached;
+		bool 				value;
 
 	};
 
 };
 
 
-#endif /* _MARBLEBAR_PROPERTY_HPP_ */
+#endif /* _MARBLEBAR_PROP_STRING_HPP_ */

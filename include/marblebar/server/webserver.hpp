@@ -93,6 +93,11 @@ namespace mb {
 		 */
 		map<mg_connection*, WebserverConnectionPtr>		connections;
 
+		/**
+		 * The current connection under processing
+		 */
+		WebserverConnectionPtr							activeConnection;
+
 	private:
 
 		/**

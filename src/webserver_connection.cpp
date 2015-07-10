@@ -64,6 +64,10 @@ void WebserverConnection::handleRawData( const char * buf, const size_t len )
         sendError("Missing 'name' parameter in the incoming request", id);
         return;
     }
+    if (!root.isMember("data")) {
+        sendError("Missing 'data' parameter in the incoming request", id);
+        return;
+    }
     // Fetch type, action and ID
     string type = root["type"].asString();
     string name = root["name"].asString();
@@ -75,7 +79,7 @@ void WebserverConnection::handleRawData( const char * buf, const size_t len )
     }
 
     // Handle action
-    handleEvent( id, name, root );
+    handleEvent( id, name, root["data"] );
 
 }
 
@@ -149,7 +153,7 @@ void WebserverConnection::sendAction( const string& event, const Json::Value& da
     Json::Value root;
 
     // Populate core fields
-    root["type"] = "event";
+    root["type"] = "action";
     root["name"] = event;
     root["id"] = id;
     root["data"] = data;

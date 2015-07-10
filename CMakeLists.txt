@@ -131,6 +131,7 @@ execute_process(
 # Locate the daemon sources
 file ( GLOB PROJECT_SOURCES 
 		${PROJECT_SOURCE_DIR}/src/*.cpp
+		${PROJECT_SOURCE_DIR}/src/properties/*.cpp
 	)
 
 

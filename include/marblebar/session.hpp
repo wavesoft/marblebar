@@ -22,8 +22,6 @@
 #define _MARBLEBAR_SESSION_HPP_
 
 #include <memory>
-#include <marblebar/kernel.hpp>
-#include <marblebar/server/webserver_connection.hpp>
 
 using namespace std;
 
@@ -33,7 +31,13 @@ namespace mb {
 	class Session;
 	typedef std::shared_ptr<Session> 	SessionPtr;
 	typedef std::weak_ptr<Session> 		SessionWeakPtr;
+}
 
+// kernel.hpp depends on us, so we should define pointers first
+#include <marblebar/kernel.hpp>
+#include <marblebar/server/webserver_connection.hpp>
+
+namespace mb {
 	/**
 	 * Session instance class
 	 */

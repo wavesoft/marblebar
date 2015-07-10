@@ -25,13 +25,24 @@ using namespace mb;
  * Property constructor
  */
 Property::Property()
- : attached(false), id("")
+ : metadata(), attached(false)
 { }
+
+/**
+ * Set a metadata property
+ */
+PropertyPtr Property::meta( const string & property, const Json::Value & value )
+{
+	// Update property
+	metadata[property] = value;
+	// Return instance for chaining calls
+	return shared_from_this();
+}
 
 /**
  * Marblebar Property constructor
  */
-void Property::attach( const ViewPtr & view, const string& id )
+void Property::attach( const ViewPtr& view, const string & id )
 {
 	this->view = view;
 	this->id = id;
@@ -48,4 +59,17 @@ void Property::markAsDirty()
 
 	// Notify view that I am dirty
 	view->markPropertyAsDirty( shared_from_this() );
+}
+
+/**
+ * Overridable function to return property specifications for the js UI
+ */
+Json::Value Property::getUISpecs()
+{
+	Json::Value data;
+	data["id"] = id;
+	data["widget"] = "text";
+	data["value"] = getUIValue();
+	data["meta"] = metadata;
+	return data;
 }

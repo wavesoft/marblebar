@@ -47,6 +47,7 @@ namespace mb {
 // view.hpp depends on us, so we should define pointers first
 #include <marblebar/view.hpp>
 #include <marblebar/property.hpp>
+#include <marblebar/session.hpp>
 
 namespace mb {
 	
@@ -70,6 +71,11 @@ namespace mb {
 		 * Add a view and return a chaining instance
 		 */
 		KernelPtr 					addView( ViewPtr config );
+
+		/**
+		 * Create and store a new view with the specified ID
+		 */
+		ViewPtr 					createView( const string & title = "" );
 
 		/**
 		 * Open browser and point to the GUI
@@ -103,6 +109,11 @@ namespace mb {
 		 */
 		virtual WebserverConnectionPtr openConnection( const std::string& domain, const std::string uri );
 
+		/**
+		 * Get next view ID
+		 */
+		string 						getNextViewID();
+
 	public:
 
 		/**
@@ -121,6 +132,11 @@ namespace mb {
 		 * Kernel state 
 		 */
 		map< string, string >		state;
+
+		/**
+		 * Last view id
+		 */
+		int 						lastViewID;
 
 	};
 

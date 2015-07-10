@@ -1,4 +1,4 @@
-/**
+ /**
  * This file is part of the MarbleBar Library.
  *
  * libMarbleBar is free software: you can redistribute it and/or modify
@@ -18,8 +18,8 @@
  * Contact: <ioannis.charalampidis[at]cern.ch>
  */
 
-#ifndef _MARBLEBAR_PROP_STRING_HPP_
-#define _MARBLEBAR_PROP_STRING_HPP_
+#ifndef _MARBLEBAR_PROP_BOOL_HPP_
+#define _MARBLEBAR_PROP_BOOL_HPP_
 
 #include <json/json.h>
 #include <string>
@@ -27,18 +27,15 @@
 
 using namespace std;
 
-namespace mb {
-
-	// Forward declarations
-	class Property;
-	typedef std::shared_ptr<Property> 	PropertyPtr;
-	typedef std::weak_ptr<Property> 	PropertyWeakPtr;
-}
-
 // view.hpp depends on us, so we should define pointers first
 #include <marblebar/view.hpp>
 
 namespace mb {
+
+	// Forward declarations
+	class PString;
+	typedef std::shared_ptr<PString> 	PStringPtr;
+	typedef std::weak_ptr<PString> 		PStringWeakPtr;
 
 	/**
 	 * Property base class from which widgets can derrive
@@ -49,7 +46,7 @@ namespace mb {
 		/**
 		 * Initialize a MarbleBar property
 		 */
-		PString();
+		PString( const string & title, const string & defaultValue = "");
 
 		/**
 		 * Overridable function to apply a property change to it's contents
@@ -69,18 +66,36 @@ namespace mb {
 	public:
 
 		/**
-		 * The view is ID
+		 * Static cast to string
 		 */
-		string 			id;
+		operator string() const;
 
 		/**
-		 * The parent view
+		 * Assign operator
 		 */
-		ViewPtr			view;
+		PString & operator= ( const string & str );
+		PString & operator= ( string str );
+		PString & operator= ( const char* str );
+		PString & operator= ( char* str );
+
+		/**
+		 * Append operator
+		 */
+		PString & operator+= ( const string & str );
+		PString & operator+= ( string str );
+		PString & operator+= ( const char* str );
+		PString & operator+= ( char* str );
+
+	private:
+
+		/**
+		 * The internal property
+		 */
+		string 				value;
 
 	};
 
 };
 
 
-#endif /* _MARBLEBAR_PROP_STRING_HPP_ */
+#endif /* _MARBLEBAR_PROP_BOOL_HPP_ */

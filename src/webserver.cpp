@@ -90,14 +90,16 @@ int Webserver::api_handler(struct mg_connection *conn)
             c = self->openConnection(domain, url);
             c->isIterated = true;
             self->connections[conn] = c;
-            
+
         } else {
             c = self->connections[conn];
         }
 
         // Handle TEXT frames 
         if ( (conn->wsbits & 0x0F) == 0x01) {
+            self->activeConnection = c;
             c->handleRawData(conn->content, conn->content_len);
+            self->activeConnection = WebserverConnectionPtr();
         }
 
         // Check if connection is closed
@@ -211,7 +213,7 @@ int Webserver::ev_handler(struct mg_connection *conn, enum mg_event ev)
  * Create a webserver and setup listening port
  */
 Webserver::Webserver( ConfigPtr config ) 
-    : config(config), staticResources(), connections() 
+    : config(config), staticResources(), connections(), activeConnection()
 {
 
 	// Create a mongoose server, passing the pointer

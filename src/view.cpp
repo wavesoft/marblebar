@@ -19,14 +19,17 @@
  */
 
 #include "marblebar/view.hpp"
+#include <sstream>
 using namespace mb;
 
 /**
  * Marblebar View constructor
  */
-View::View() : 
-	attached(false), id(""), properties()
-{ }
+View::View( const string & title ) : 
+	attached(false), id(""), properties(), metadata(), lastPropertyID(0)
+{
+	metadata["title"] = title;
+}
 
 /**
  * Marblebar View constructor
@@ -41,20 +44,31 @@ void View::attach( const KernelPtr& kernel, const string& id )
 /**
  * Marblebar View constructor
  */
-ViewPtr View::addProperty( PropertyPtr property )
+// ViewPtr View::addProperty( PropertyPtr property )
+// {
+// 	// Do not do anything unless attached
+// 	if (!this->attached) return shared_from_this();
+
+// 	// Attach property to me
+// 	property->attach( shared_from_this() );
+
+// 	// Keep property
+// 	properties.push_back( property );
+
+// 	// Return instance for chain-calling
+// 	return shared_from_this();
+
+// }
+
+/**
+ * Set a metadata property
+ */
+ViewPtr View::meta( const string & property, const Json::Value & value )
 {
-	// Do not do anything unless attached
-	if (!this->attached) return shared_from_this();
-
-	// Attach property to me
-	property->attach( shared_from_this(), "" );
-
-	// Keep property
-	properties.push_back( property );
-
-	// Return instance for chain-calling
+	// Update property
+	metadata[property] = value;
+	// Return instance for chaining calls
 	return shared_from_this();
-
 }
 
 /**
@@ -79,7 +93,7 @@ Json::Value View::getUISpecs()
 	if (!this->attached) return Json::Value();
 
 	// Get View ID
-	Json::Value value, prop;
+	Json::Value value, prop, specs;
 	value["id"] = id;
 
 	// Iterate over properties and collect specs
@@ -87,7 +101,21 @@ Json::Value View::getUISpecs()
 		prop.append( (*it)->getUISpecs() );
 	}
 	value["properties"] = prop;
+	value["meta"] = metadata;
 
 	// Return specifications
 	return value;
+}
+
+
+/**
+ * Calculate and return the next property ID
+ */
+string View::getNextPropertyID()
+{
+	// Compose view ID 
+	ostringstream oss;
+	oss << "p" << (++lastPropertyID);
+	// Return view-index
+	return oss.str();
 }

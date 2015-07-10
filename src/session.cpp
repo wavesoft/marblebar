@@ -19,6 +19,8 @@
  */
 
 #include "marblebar/session.hpp"
+#include <iostream>
+
 using namespace mb;
 
 /**
@@ -80,8 +82,9 @@ void Session::handleEvent( const string& id, const string& event, const Json::Va
 	if (event == "ui/init") {
 
 		// Initialize the UI by sending all the view specifications
-		for (auto it = kernel->views.begin(); it != kernel->views.end(); ++it)
+		for (auto it = kernel->views.begin(); it != kernel->views.end(); ++it) {
 			this->notifyViewAdded( *it );
+		}
 
 	} else if (event == "property/event") {
 

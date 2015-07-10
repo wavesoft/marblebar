@@ -50,7 +50,7 @@ namespace mb {
 		/**
 		 * Initialize a MarbleBar view
 		 */
-		View();
+		View( const string & title = "" );
 
 		/**
 		 * Attach to a kernel
@@ -60,7 +60,22 @@ namespace mb {
 		/**
 		 * Add a property
 		 */
-		ViewPtr 					addProperty( PropertyPtr property );
+		template<class T> 
+		shared_ptr<T> 				addProperty( shared_ptr<T> property ) 
+		{
+
+			// Create property
+			properties.push_back(
+					dynamic_pointer_cast<Property>( property )
+				);
+
+			// Attach to this
+			property->attach( shared_from_this(), getNextPropertyID() );
+
+			// Pass-through
+			return property;
+
+		}
 
 		/**
 		 * Mark a particular property as dirty
@@ -71,6 +86,16 @@ namespace mb {
 		 * Get view UI specifications
 		 */
 		Json::Value					getUISpecs();
+
+		/**
+		 * Update a metadata field
+		 */
+		ViewPtr 					meta( const string & property, const Json::Value & value );
+
+		/**
+		 * Get next property ID
+		 */
+		string 						getNextPropertyID();
 
 	public:
 
@@ -85,6 +110,11 @@ namespace mb {
 		vector< PropertyPtr >		properties;
 		
 		/**
+		 * Metatada information
+		 */
+		Json::Value 				metadata;
+
+		/**
 		 * The kernel that hosts the property
 		 */
 		KernelPtr					kernel;
@@ -95,6 +125,11 @@ namespace mb {
 		 * Flag if this view is attached
 		 */
 		bool 						attached;
+
+		/**
+		 * Last view id
+		 */
+		int 						lastPropertyID;
 
 	};
 

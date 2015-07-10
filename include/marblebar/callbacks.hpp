@@ -18,17 +18,54 @@
  * Contact: <ioannis.charalampidis[at]cern.ch>
  */
 
-#ifndef _MARBLEBAR_HPP_
-#define _MARBLEBAR_HPP_
+#ifndef _MARBLEBAR_CALLBACKS_HPP_
+#define _MARBLEBAR_CALLBACKS_HPP_
 
-// Include MarbleBar Kernel
-#include <marblebar/config.hpp>
-#include <marblebar/property.hpp>
-#include <marblebar/view.hpp>
-#include <marblebar/kernel.hpp>
-#include <marblebar/session.hpp>
+#include <string>
+#include <memory>
+#include <functional>
+ 
+using namespace std;
 
-#include <marblebar/properties/string.hpp>
-#include <marblebar/properties/bool.hpp>
+namespace mb {
 
-#endif /* _MARBLEBAR_HPP_ */
+	// Forward declarations
+	class Config;
+	typedef std::shared_ptr<Config> 	ConfigPtr;
+	typedef std::weak_ptr<Config> 		ConfigWeakPtr;
+
+	/**
+	 * Return a default config instance
+	 */
+	inline ConfigPtr defaultConfig()
+		{ return std::make_shared<Config>(); };
+
+	/**
+	 * Configuration class
+	 */
+	class Config {
+	public:
+
+		/**
+		 * Intiialize MarbleBar config
+		 */
+		Config()
+			: webserverPort( 15234 )
+		{ }
+
+		/**
+		 * The server version
+		 */
+		const string version 	= "0.0.1";
+
+		/**
+		 * The port to listen at
+		 */
+		int webserverPort;
+
+	};
+
+};
+
+
+#endif /* _MARBLEBAR_CALLBACKS_HPP_ */

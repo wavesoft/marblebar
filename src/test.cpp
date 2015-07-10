@@ -1,9 +1,26 @@
 
 #include <marblebar.hpp>
+#include <iostream>
+
+using namespace mb;
+using namespace std;
 
 int main(int argc, char ** argv) {
 
-	mb::KernelPtr kernel = mb::createKernel( mb::defaultConfig() );
+	KernelPtr kernel = createKernel( defaultConfig() );
+
+	ViewPtr view = kernel->createView( "Primary" );
+	PStringPtr p1 = view->addProperty( make_shared<PString>("First Value", "value") );
+	PStringPtr p2 = view->addProperty( make_shared<PString>("Second Value", "value") );
+	PBoolPtr p3 = view->addProperty( make_shared<PBool>("Toggler", false) );
+
+
+	*p1 = "test";
+	*p1 += "ing";
+
+	string test = *p1;
+	cout << "Res = " << test;
+	cout << endl;
 
 	kernel->openGUI();
 	kernel->start();

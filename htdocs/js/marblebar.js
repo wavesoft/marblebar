@@ -1,9 +1,231 @@
-(function() {
+$(function() {
 
 	/**
 	 * Where to find marblebar server
 	 */
-	var WS_ENDPOINT = "ws://127.0.0.1:15234/";
+	var WS_ENDPOINT = "ws://127.0.0.1:15234";
+
+	/**
+	 * Allocate new unique ID
+	 */
+	var cid = 0;
+	function new_id() { return 'uid-'+(++cid); };
+
+	////////////////////////////////////////////////
+	// Widget Base Class
+	////////////////////////////////////////////////
+
+	/**
+	 * Widget base class
+	 */
+	var Widget = function( hostDOM, specs ) {
+		this.id = "";
+		this.view = null;
+		this.hostDOM = hostDOM;
+	};
+
+	/**
+	 * Create a new widget
+	 */
+	Widget.create = function( constructor, methods ) {
+		// Create typed widget constructor
+		var CustomWidget = function( hostDOM, specs ) {
+			Widget.call(this, hostDOM, specs);
+			constructor.call(this, hostDOM, specs);
+		};
+		// Subclass from widget
+		CustomWidget.prototype = Object.create( Widget.prototype );
+		return CustomWidget;
+	};
+
+	/**
+	 * Trigger a particular event
+	 */
+	Widget.prototype.trigger = function(event, data) {
+		if (!this.view) return;
+
+		// Forward event through the kernel
+		this.view.kernel.sendEvent("property/event", {
+			"view": this.view.id,
+			"prop": this.id,
+			"name": event,
+			"data": data
+		});
+	}
+
+	/**
+	 * Overridable function to update widget value
+	 */
+	Widget.prototype.update = function(value) {
+	}
+
+	////////////////////////////////////////////////
+	// Widget Repository
+	////////////////////////////////////////////////
+
+	/**
+	 * The widgets repository
+	 */
+	var Widgets = { };
+
+	/**
+	 * [text] A Text widget rendered as an input element
+	 */
+	Widgets['text'] = Widget.create(function( hostDOM, specs ) {
+
+		// Initialize widget
+		var id = new_id();
+		this.label = $('<label class="col-sm-2 control-label" for="'+id+'"></label>').text( specs['meta']['title'] ).appendTo( hostDOM );
+		this.input = $('<input class="form-control" id="'+id+'"></input>').appendTo(
+			$('<div class="col-sm-10"></div>').appendTo(hostDOM)
+		);
+
+		// Handle property update
+		this.update = function( value ) {
+			// Set to text field value
+			this.input.attr("value", value);
+		}
+
+		// Register updates
+		$(this.input).on("click blur keyup", (function() {
+			// Trigger value update
+			this.trigger("update", { "value": this.input.val() });
+		}).bind(this));
+
+	});
+
+	/**
+	 * [toggle] A Togglable widget for boolean values
+	 */
+	Widgets['toggle'] = Widget.create(function( hostDOM, specs ) {
+
+		// Initialize widget
+		var id = new_id();
+		this.label = $('<label class="col-sm-2 control-label" for="'+id+'"></label>').text( specs['meta']['title'] ).appendTo( hostDOM );
+		this.btn = $('<button type="button" id="'+id+'" class="btn btn-danger">Off</button>').appendTo(
+			$('<div class="col-sm-10"></div>').appendTo(hostDOM)
+		);
+
+		// Handle property update
+		this.update = function( value ) {
+			if (value) {
+				this.btn
+					.removeClass("btn-danger")
+					.addClass("btn-success")
+					.text("On");
+
+			} else {
+				this.btn
+					.removeClass("btn-success")
+					.addClass("btn-danger")
+					.text("Off");
+			}
+		}
+
+		// Register updates
+		$(this.btn).on("click", (function() {
+
+			// Toggle class
+			if (this.btn.hasClass("btn-danger")) {
+				this.trigger("update", { "value": true });
+				this.btn
+					.removeClass("btn-danger")
+					.addClass("btn-success")
+					.text("On");
+			} else {
+				this.trigger("update", { "value": false });
+				this.btn
+					.removeClass("btn-success")
+					.addClass("btn-danger")
+					.text("Off");
+			}
+
+		}).bind(this));
+
+	});
+
+	////////////////////////////////////////////////
+	// View Interface
+	////////////////////////////////////////////////
+
+	/**
+	 * The View interface API
+	 */
+	var View = function( kernel, hostDOM, specs ) {
+
+		// Initialize properties
+		this.id = specs.id;
+		this.kernel = kernel;
+		this.properties = [];
+		this.propertyIndex = { };
+
+		// Initialize tab DOMs
+		var eid = new_id();
+		this.hostDOM = hostDOM;
+		this.tabDOM = $(' <li role="presentation"><a href="#'+eid+'" aria-controls="'+eid+'" role="tab" data-toggle="tab">'+specs.meta.title+'</a></li>')
+			.appendTo(hostDOM.find(".mb-gui-tabnav"));
+		this.bodyDOM = $('<div role="tabpanel" class="tab-pane mb-view" id="'+eid+'"></div>')
+			.appendTo(hostDOM.find(".mb-gui-tabpane"));
+
+		// Initialize property host
+		this.propertyDOM = $('<form class="form-horizontal"></form>').appendTo( this.bodyDOM );
+
+		// Activate tab
+		//$(this.bodyDOM).tab();
+
+		// Create properties
+		for (var i=0; i<specs.properties.length; i++) {
+			this.createProperty( specs.properties[i] );
+		}
+
+	}
+
+	/**
+	 * Add a property in the view
+	 */
+	View.prototype.createProperty = function( specs ) {
+
+		// Instance property from specs
+		var widget_CLASS = Widgets[specs.widget || "text"],
+			widgetDOM = $('<div class="form-group mb-property"></div>').appendTo( this.propertyDOM );
+
+		// Check for errors
+		if (!widget_CLASS) {
+			console.error("[widget] Unknown widget '" + specs.widget + "'");
+			return;
+		}
+
+		// Create and initialize widget
+		var widget = new widget_CLASS( widgetDOM, specs );
+		widget.view = this;
+		widget.id = specs.id;
+
+		// Store on index
+		this.propertyIndex[ specs.id ] = widget;
+		this.properties.push( widget );
+
+		// Apply value
+		widget.update( specs.value );
+
+	}
+
+	/**
+	 * Add a property in the view
+	 */
+	View.prototype.updateProperty = function( id, value ) {
+		if (!this.propertyIndex[id]) return;
+		this.propertyIndex[id].update( value );
+	}
+
+	/**
+	 * Erase view properties
+	 */
+	View.prototype.wipe = function() {
+		for (var i=0; i<this.properties; i++) {
+
+		}
+		this.properties = [];
+	}
 
 	////////////////////////////////////////////////
 	// MarbleBar CORE API
@@ -22,9 +244,6 @@
 		this.lastID = 0;
 		this.responseCallbacks = {};
 		this.actionHandlers = [];
-
-		// Try to connect
-		this.connect();
 
 	};
 
@@ -46,7 +265,7 @@
 			var data = o['data'];
 			// Forward to user
 			for (var i=0; i<this.actionHandlers.length; i++) {
-				this.this.actionHandlers[i]( o['name'], o['data'] );
+				this.actionHandlers[i]( o['name'], o['data'] );
 			}
 		}
 	}
@@ -54,7 +273,7 @@
 	/**
 	 * Send an event to server JSON frame
 	 */
-	SocketPrototype.sendEvent = function(eventName, data, responseEvents, responseTimeout) {
+	Marblebar.prototype.sendEvent = function(eventName, data, responseEvents, responseTimeout) {
 		var self = this;
 		var timeoutTimer = null;
 
@@ -157,15 +376,16 @@
 	 * Disconnect from the websocket & cleanup GUI
 	 */
 	Marblebar.prototype.disconnect = function() {
-		if (!this.connected) return;
-
-		// Disconnect
-		this.socket.close();
-		this.connected = false;
-		this.socket = null;
-
 		// Destroy GUI
 		this.destroyGUI();
+
+		// Disconnect
+		if (this.socket) {
+			this.socket.close();
+			this.connected = false;
+			this.socket = null;
+		}
+
 	}
 
 	/**
@@ -173,6 +393,7 @@
 	 */
 	Marblebar.prototype.connect = function( timeout ) {
 		var self = this;
+		this.log("[socket] Connecting");
 		try {
 			// Calculate timeout
 			if (!timeout) timeout=500;
@@ -191,6 +412,7 @@
 
 			// Setup websocket & callbacks
 			socket.onerror = function(e) {
+				self.log("[socket] Error connecting to socket");
 				console.warn("[socket] Error connecting to socket", e);
 				if (timedOut) return;
 				clearTimeout(timeoutCb);
@@ -200,20 +422,24 @@
 			};
 			socket.onopen = function(e) {
 				if (timedOut) return;
+				self.log("[socket] Connection open");
 				clearTimeout(timeoutCb);
 				self.socket = socket;
 				self.connected = true;
 				self.initGUI();
 			};
 			socket.onclose = function() {
+				self.log("[socket] Socket disconnected");
 				console.warn("[socket] Socket disconnected");
 				self.disconnect();
 			};
 			socket.onmessage = function(e) {
-				self.__handleData();
+				self.log("[socket] Incoming message");
+				self.__handleData( e.data );
 			};
 
 		} catch(e) {
+			this.log("[socket] Error setting up socket");
 			console.warn("[socket] Error setting up socket", e);
 			if (timedOut) return;
 			clearTimeout(timeoutCb);
@@ -233,13 +459,16 @@
 	var MarbleGUI = function( hostDOM ) {
 		var self = this;
 		Marblebar.call(this);
-		this.hostDOM = $(hostDOM);
+
+		// Initialize properties
+		this.views = [];
+		this.viewIndex = {};
 
 		// Bind listeners
 		this.actionHandlers.push(function(action, data) {
 
 			if (action == 'view/add') {
-				self.addView( data['id'], data['specs'] );
+				self.addView( data['id'], data );
 			} else if (action == 'view/remove') {
 				self.remView( data['id'] );
 			} else if (action == 'view/propchange') {
@@ -248,16 +477,32 @@
 
 		});
 
+		// Initialize DOMs
+		this.hostDOM = $(hostDOM);
+		this.logDOM = this.hostDOM.find("#mb-console-log");
+
 	};
 
 	// Subclass from MarbleBar
 	MarbleGUI.prototype = Object.create( Marblebar.prototype );
 
 	/**
+	 * Log a message
+	 */
+	MarbleGUI.prototype.log = function( message ) {
+		$('<div></div>').text(message).appendTo(this.logDOM);
+	}
+
+	/**
 	 * Add a MarbleBar View
 	 */
 	MarbleGUI.prototype.addView = function( id, specs ) {
+		// Create a DOM & View instance
+		var view = new View( this, this.hostDOM, specs );
 
+		// Put on index
+		this.views.push(view);
+		this.viewIndex[id] = view;		
 	}
 
 	/**
@@ -271,7 +516,11 @@
 	 * Set a view property value
 	 */
 	MarbleGUI.prototype.setViewProperty = function( id, prop, value ) {
-
+		// Make sure we have that view and property
+		if (!this.viewIndex[id]) return;
+		if (!this.viewIndex[id].propertyIndex[prop]) return;
+		// Apply value changes
+		this.viewIndex[id].propertyIndex[prop].update( value );
 	}
 
 	/**
@@ -280,7 +529,7 @@
 	MarbleGUI.prototype.initGUI = function() {
 
 		// Send a request to initialize the GUI
-		this.sendEvent("init");
+		this.sendEvent("ui/init");
 
 	}
 
@@ -289,6 +538,11 @@
 	 */
 	MarbleGUI.prototype.destroyGUI = function() {
 		this.hostDOM.empty();
+
+		// Create a blank GUI
+		this.hostDOM.append(
+			$('<div class="alert alert-danger" role="alert"><strong>Disconnected from application</strong>. The application might have stopped or the connection with the application was interrupted. Try refreshing and if the problem insists restart the application.</div>')
+		);
 	}
 
 	////////////////////////////////////////////////
@@ -300,4 +554,4 @@
 	// Connect and initialize
 	window.marblebar.connect();
 
-})();
+})
