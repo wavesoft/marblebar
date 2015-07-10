@@ -1,4 +1,4 @@
-# marblebar
+# The MarbleBar GUI
 A minimal footprint Web GUI library for C++11 with a tiny embedded web browser. I wrote this library because I wanted a cross-platform GUI without the need to drag along massive SDKs.
 
 The concept is very simple: The library includes a tiny webserver, it's static resources to serve and the core logic required in order to crate simple views. It comes complete, with bootstrap for nice GUIs (offline of course), and a modular appropach on writing custom widgets.
