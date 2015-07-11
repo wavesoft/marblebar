@@ -114,8 +114,48 @@ Json::Value PString::getUISpecs()
 
 On the javascript side, the `MarbleBar` GUI will expect to find the specified view in the `MarbleBar.Widgets` global object. Each widget should be a subclass of the `MarbleBar.Widget` global class.
 
-There is a helper function that takes care of subclassing from main method
+There is a helper function that automatically does this subclassing and method overloading so you can only focus to the widget development. Have a look on the respective widget for the `PString` property:
 
+```javascript
+MarbleBar.Widgets['text'] = MarbleBar.Widget.create(
+    // Constructor
+    function( hostDOM, specs ) {
+        // Initialize widget
+        var id = MarbleBar.new_id();
+        this.label = $('<label class="col-sm-2 control-label" for="'+id+'"></label>').text( specs['meta']['title'] ).appendTo( hostDOM );
+        this.input = $('<input class="form-control" id="'+id+'"></input>').appendTo(
+            $('<div class="col-sm-10"></div>').appendTo(hostDOM)
+        );
+        // Register updates
+        $(this.input).on("click blur keyup", (function() {
+            // Trigger value update
+            this.trigger("update", { "value": this.input.val() });
+        }).bind(this));
+    }, {
+        // Update widget value
+        update: function(value) {
+            // Set to text field value
+            this.input.attr("value", value);
+        }
+    }
+);
+``` 
+
+The `update` function is triggered when the property is changed by the C++ code. Respectively, the widget can trigger arbitrary events to the C++ code. In this case the `update` event updates the value of the property.
+
+You can see how this event is handled in the `PString::handleUIEvent` function:
+
+```cpp
+void PString::handleUIEvent( const string & event, const Json::Value & data )
+{
+    if (event == "update") {
+        value = data["value"].asString();
+        this->markAsDirty();
+    }
+}
+```
+
+Remember to call the `Property::markAsDirty` function in order to propagate the changes to the other GUI instances.
 
 ## License
 
