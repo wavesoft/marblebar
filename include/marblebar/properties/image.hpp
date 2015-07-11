@@ -78,6 +78,11 @@ namespace mb {
 		PImage & operator= ( const char* str );
 		PImage & operator= ( char* str );
 
+		/**
+		 * Set from binary buffer
+		 */
+		void 				setBinary( const unsigned char * buffer, size_t len, const string & contentType );
+
 	private:
 
 		/**

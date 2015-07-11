@@ -246,13 +246,22 @@
 	 * Create a new widget
 	 */
 	Widget.create = function( constructor, methods ) {
+		
 		// Create typed widget constructor
 		var CustomWidget = function( hostDOM, specs ) {
 			Widget.call(this, hostDOM, specs);
 			constructor.call(this, hostDOM, specs);
 		};
+
 		// Subclass from widget
 		CustomWidget.prototype = Object.create( Widget.prototype );
+
+		// Register all methods on the prototype
+		for (var k in methods)
+			if (methods.hasOwnProperty(k))
+				CustomWidget.prototype[k] = methods[k];
+
+		// Return custom widget
 		return CustomWidget;
 	};
 

@@ -19,7 +19,12 @@
  */
 
 #include "marblebar/properties/image.hpp"
+#include <cassert>
+ 
 using namespace mb;
+
+/* Base64 Character Table */
+static const char b64_table[65] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 /**
  * PImage Constructor
@@ -64,6 +69,54 @@ Json::Value PImage::getUISpecs()
 //////////////////////////////////////////////
 // Ease of use operators
 //////////////////////////////////////////////
+
+/**
+ * Set image from binary contents
+ */
+void PImage::setBinary( const unsigned char * ptr, size_t binlen, const string & contentType )
+{
+	// Validate length
+    using ::std::string;
+    using ::std::numeric_limits;
+    if (binlen > (std::numeric_limits<string::size_type>::max() / 4u) * 3u) {
+       throw ::std::length_error("Converting too large a string to base64.");
+    }
+
+    // Prepare data prefix
+    string prefix = "data:" + contentType + ";base64,";
+
+    // Use = signs so the end is properly padded.
+    ::std::size_t outpos = prefix.length();
+    string retval((((binlen + 2) / 3) * 4) + outpos, '=');
+
+    // Insert prefix
+    retval.replace(0, outpos, prefix);
+
+    // Convert 
+    int bits_collected = 0;
+    unsigned int accumulator = 0;
+    const unsigned char * ptrEnd = ptr + binlen;
+
+    for (const unsigned char * i = ptr; i < ptrEnd; ++i) {
+       accumulator = (accumulator << 8) | (*i & 0xffu);
+       bits_collected += 8;
+       while (bits_collected >= 6) {
+          bits_collected -= 6;
+          retval[outpos++] = b64_table[(accumulator >> bits_collected) & 0x3fu];
+       }
+    }
+    if (bits_collected > 0) { // Any trailing bits that are missing.
+       assert(bits_collected < 6);
+       accumulator <<= 6 - bits_collected;
+       retval[outpos++] = b64_table[accumulator & 0x3fu];
+    }
+    assert(outpos >= (retval.size() - 2));
+    assert(outpos <= retval.size());
+
+    // Set value
+	this->value = retval;
+	this->markAsDirty();
+}
 
 /**
  * Static cast to string

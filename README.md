@@ -55,6 +55,29 @@ int main(int argc, char ** argv) {
 };
 ```
 
+## Quick Terminology Intro
+
+From the C++ point of view, you are operating on view one or more `Property` objects in a `View`. This property is rendered in the javascript interface using a corresponding `Widget`. You can specify the widget in the property's specifications description. 
+
+Have a look on the `PString::getUISpecs` method:
+
+```cpp
+Json::Value PString::getUISpecs()
+{
+    Json::Value data;
+    data["id"] = id;
+    data["widget"] = "text";    // You select your widget here
+    data["value"] = value;
+    data["meta"] = metadata;
+    return data;
+}
+```
+
+On the javascript side, the `MarbleBar` GUI will expect to find the specified view in the `MarbleBar.Widgets` global object. Each widget should be a subclass of the `MarbleBar.Widget` global class.
+
+There is a helper function that takes care of subclassing from main method
+
+
 ## License
 
 MarbleBar is licensed under GNU GPL Version 2.0, Open-Source license.
