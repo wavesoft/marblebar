@@ -118,7 +118,10 @@ There is a helper function that automatically does this subclassing and method o
 
 ```javascript
 MarbleBar.Widgets['text'] = MarbleBar.Widget.create(
-    // Constructor
+    //
+    // First argument to the create function
+    // is the constructor function.
+    //
     function( hostDOM, specs ) {
         // Initialize widget
         var id = MarbleBar.new_id();
@@ -131,7 +134,14 @@ MarbleBar.Widgets['text'] = MarbleBar.Widget.create(
             // Trigger value update
             this.trigger("update", { "value": this.input.val() });
         }).bind(this));
-    }, {
+    }, 
+
+    //
+    // The second argument is an object
+    // with the additional functions to inject
+    // in the widget's prototype class.
+    //
+    {
         // Update widget value
         update: function(value) {
             // Set to text field value
