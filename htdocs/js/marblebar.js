@@ -1,285 +1,9 @@
-$(function() {
+(function() {
 
 	/**
-	 * Where to find marblebar server
+	 * Where to find marbleBar server
 	 */
 	var WS_ENDPOINT = "ws://127.0.0.1:15234";
-
-	/**
-	 * Allocate new unique ID
-	 */
-	var cid = 0;
-	function new_id() { return 'uid-'+(++cid); };
-
-	////////////////////////////////////////////////
-	// Widget Base Class
-	////////////////////////////////////////////////
-
-	/**
-	 * Widget base class
-	 */
-	var Widget = function( hostDOM, specs ) {
-		this.id = "";
-		this.view = null;
-		this.hostDOM = hostDOM;
-	};
-
-	/**
-	 * Create a new widget
-	 */
-	Widget.create = function( constructor, methods ) {
-		// Create typed widget constructor
-		var CustomWidget = function( hostDOM, specs ) {
-			Widget.call(this, hostDOM, specs);
-			constructor.call(this, hostDOM, specs);
-		};
-		// Subclass from widget
-		CustomWidget.prototype = Object.create( Widget.prototype );
-		return CustomWidget;
-	};
-
-	/**
-	 * Trigger a particular event
-	 */
-	Widget.prototype.trigger = function(event, data) {
-		if (!this.view) return;
-
-		// Forward event through the kernel
-		this.view.kernel.sendEvent("property/event", {
-			"view": this.view.id,
-			"prop": this.id,
-			"name": event,
-			"data": data
-		});
-	}
-
-	/**
-	 * Overridable function to update widget value
-	 */
-	Widget.prototype.update = function(value) {
-	}
-
-	////////////////////////////////////////////////
-	// Widget Repository
-	////////////////////////////////////////////////
-
-	/**
-	 * The widgets repository
-	 */
-	var Widgets = { };
-
-	/**
-	 * [text] A Text widget rendered as an input element
-	 */
-	Widgets['text'] = Widget.create(function( hostDOM, specs ) {
-
-		// Initialize widget
-		var id = new_id();
-		this.label = $('<label class="col-sm-2 control-label" for="'+id+'"></label>').text( specs['meta']['title'] ).appendTo( hostDOM );
-		this.input = $('<input class="form-control" id="'+id+'"></input>').appendTo(
-			$('<div class="col-sm-10"></div>').appendTo(hostDOM)
-		);
-
-		// Handle property update
-		this.update = function( value ) {
-			// Set to text field value
-			this.input.attr("value", value);
-		}
-
-		// Register updates
-		$(this.input).on("click blur keyup", (function() {
-			// Trigger value update
-			this.trigger("update", { "value": this.input.val() });
-		}).bind(this));
-
-	});
-
-	/**
-	 * [toggle] A Togglable widget for boolean values
-	 */
-	Widgets['toggle'] = Widget.create(function( hostDOM, specs ) {
-
-		// Initialize widget
-		var id = new_id();
-		this.label = $('<label class="col-sm-2 control-label" for="'+id+'"></label>').text( specs['meta']['title'] ).appendTo( hostDOM );
-		this.btn = $('<button type="button" id="'+id+'" class="btn btn-danger">Off</button>').appendTo(
-			$('<div class="col-sm-10"></div>').appendTo(hostDOM)
-		);
-
-		// Handle property update
-		this.update = function( value ) {
-			if (value) {
-				this.btn
-					.removeClass("btn-danger")
-					.addClass("btn-success")
-					.text("On");
-
-			} else {
-				this.btn
-					.removeClass("btn-success")
-					.addClass("btn-danger")
-					.text("Off");
-			}
-		}
-
-		// Register updates
-		$(this.btn).on("click", (function() {
-
-			// Toggle class
-			if (this.btn.hasClass("btn-danger")) {
-				this.trigger("update", { "value": true });
-				this.btn
-					.removeClass("btn-danger")
-					.addClass("btn-success")
-					.text("On");
-			} else {
-				this.trigger("update", { "value": false });
-				this.btn
-					.removeClass("btn-success")
-					.addClass("btn-danger")
-					.text("Off");
-			}
-
-		}).bind(this));
-
-	});
-
-	/**
-	 * [slider] A slider widget for integer values
-	 */
-	Widgets['slider'] = Widget.create(function( hostDOM, specs ) {
-
-		// Initialize widget
-		var id = new_id();
-		this.label = $('<label class="col-sm-2 control-label" for="'+id+'"></label>').text( specs['meta']['title'] ).appendTo( hostDOM );
-		this.input = $('<input id="'+id+'" type="text" />').appendTo(
-			$('<div class="col-sm-10"></div>').appendTo(hostDOM)
-		);
-
-		// Create slider
-		$(this.input).slider({
-			'min': specs.meta.min || 0,
-			'max': specs.meta.max || 100,
-			'step': specs.meta.step || 1,
-			'value': specs.value
-		});
-		$(this.input).on("slide", (function(slideEvt) {
-			this.trigger("update", { "value": slideEvt.value });
-		}).bind(this));
-
-		// Handle property update
-		this.update = function( value ) {
-			this.input.slider('setValue', value);
-		}
-
-	});
-
-	/**
-	 * [image] An image widget for rendering images (duh!)
-	 */
-	Widgets['image'] = Widget.create(function( hostDOM, specs ) {
-
-		// Initialize widget
-		var id = new_id();
-		this.label = $('<label class="col-sm-2 control-label" for="'+id+'"></label>').text( specs['meta']['title'] ).appendTo( hostDOM );
-		this.img = $('<img id="'+id+'" src="" />').appendTo(
-			$('<div class="well well-sm"></div>').appendTo(
-				$('<div class="col-sm-10"></div>').appendTo(hostDOM)
-			)
-		);
-
-		// Apply width/height if defined
-		if (specs.meta.width >= 0)
-			this.img.attr("width", specs.meta.width);
-		if (specs.meta.height >= 0)
-			this.img.attr("height", specs.meta.height);
-
-		// Handle property update
-		this.update = function( value ) {
-			this.img.attr('src', value);
-		}
-
-	});
-
-	////////////////////////////////////////////////
-	// View Interface
-	////////////////////////////////////////////////
-
-	/**
-	 * The View interface API
-	 */
-	var View = function( kernel, hostDOM, specs ) {
-
-		// Initialize properties
-		this.id = specs.id;
-		this.kernel = kernel;
-		this.properties = [];
-		this.propertyIndex = { };
-
-		// Initialize tab DOMs
-		var eid = new_id();
-		this.hostDOM = hostDOM;
-		this.tabDOM = $(' <li role="presentation"><a href="#'+eid+'" aria-controls="'+eid+'" role="tab" data-toggle="tab">'+specs.meta.title+'</a></li>')
-			.appendTo(hostDOM.find(".mb-gui-tabnav"));
-		this.bodyDOM = $('<div role="tabpanel" class="tab-pane mb-view" id="'+eid+'"></div>')
-			.appendTo(hostDOM.find(".mb-gui-tabpane"));
-
-		// Initialize property host
-		this.propertyDOM = $('<form class="form-horizontal"></form>').appendTo( this.bodyDOM );
-
-		// Create properties
-		for (var i=0; i<specs.properties.length; i++) {
-			this.createProperty( specs.properties[i] );
-		}
-
-	}
-
-	/**
-	 * Add a property in the view
-	 */
-	View.prototype.createProperty = function( specs ) {
-
-		// Instance property from specs
-		var widget_CLASS = Widgets[specs.widget || "text"],
-			widgetDOM = $('<div class="form-group mb-property"></div>').appendTo( this.propertyDOM );
-
-		// Check for errors
-		if (!widget_CLASS) {
-			console.error("[widget] Unknown widget '" + specs.widget + "'");
-			return;
-		}
-
-		// Create and initialize widget
-		var widget = new widget_CLASS( widgetDOM, specs );
-		widget.view = this;
-		widget.id = specs.id;
-
-		// Store on index
-		this.propertyIndex[ specs.id ] = widget;
-		this.properties.push( widget );
-
-		// Apply value
-		widget.update( specs.value );
-
-	}
-
-	/**
-	 * Add a property in the view
-	 */
-	View.prototype.updateProperty = function( id, value ) {
-		if (!this.propertyIndex[id]) return;
-		this.propertyIndex[id].update( value );
-	}
-
-	/**
-	 * Erase view properties
-	 */
-	View.prototype.wipe = function() {
-		for (var i=0; i<this.properties; i++) {
-
-		}
-		this.properties = [];
-	}
 
 	////////////////////////////////////////////////
 	// MarbleBar CORE API
@@ -288,7 +12,7 @@ $(function() {
 	/**
 	 * The MarbleBar interface API
 	 */
-	var Marblebar = function() {
+	var MarbleBar = window.MarbleBar = function() {
 
 		// Local properties
 		this.socket = null;
@@ -302,9 +26,17 @@ $(function() {
 	};
 
 	/**
+	 * Helper function to allocate new ID
+	 */
+	MarbleBar.cid = 0;
+	MarbleBar.new_id = function() {
+		return 'uid-'+(++MarbleBar.cid); 
+	};
+
+	/**
 	 * Handle raw incoming data
 	 */
-	Marblebar.prototype.__handleData = function( data ) {
+	MarbleBar.prototype.__handleData = function( data ) {
 		var o = JSON.parse(data);
 
 		// Forward all the frames of the given ID to the
@@ -327,7 +59,7 @@ $(function() {
 	/**
 	 * Send an event to server JSON frame
 	 */
-	Marblebar.prototype.sendEvent = function(eventName, data, responseEvents, responseTimeout) {
+	MarbleBar.prototype.sendEvent = function(eventName, data, responseEvents, responseTimeout) {
 		var self = this;
 		var timeoutTimer = null;
 
@@ -429,7 +161,7 @@ $(function() {
 	/**
 	 * Disconnect from the websocket & cleanup GUI
 	 */
-	Marblebar.prototype.disconnect = function() {
+	MarbleBar.prototype.disconnect = function() {
 		// Destroy GUI
 		this.destroyGUI();
 
@@ -445,7 +177,7 @@ $(function() {
 	/**
 	 * Connect to the websocket and initialize GUI
 	 */
-	Marblebar.prototype.connect = function( timeout ) {
+	MarbleBar.prototype.connect = function( timeout ) {
 		var self = this;
 		try {
 			// Calculate timeout
@@ -498,6 +230,143 @@ $(function() {
 	}
 
 	////////////////////////////////////////////////
+	// Widget Base Class
+	////////////////////////////////////////////////
+
+	/**
+	 * Widget base class
+	 */
+	var Widget = MarbleBar.Widget = function( hostDOM, specs ) {
+		this.id = "";
+		this.view = null;
+		this.hostDOM = hostDOM;
+	};
+
+	/**
+	 * Create a new widget
+	 */
+	Widget.create = function( constructor, methods ) {
+		// Create typed widget constructor
+		var CustomWidget = function( hostDOM, specs ) {
+			Widget.call(this, hostDOM, specs);
+			constructor.call(this, hostDOM, specs);
+		};
+		// Subclass from widget
+		CustomWidget.prototype = Object.create( Widget.prototype );
+		return CustomWidget;
+	};
+
+	/**
+	 * Trigger a particular event
+	 */
+	Widget.prototype.trigger = function(event, data) {
+		if (!this.view) return;
+
+		// Forward event through the kernel
+		this.view.kernel.sendEvent("property/event", {
+			"view": this.view.id,
+			"prop": this.id,
+			"name": event,
+			"data": data
+		});
+	}
+
+	/**
+	 * Overridable function to update widget value
+	 */
+	Widget.prototype.update = function(value) {
+	}
+
+	////////////////////////////////////////////////
+	// Widget Repository
+	////////////////////////////////////////////////
+
+	/**
+	 * The widgets repository
+	 */
+	var Widgets = MarbleBar.Widgets = { };
+
+	////////////////////////////////////////////////
+	// View Interface
+	////////////////////////////////////////////////
+
+	/**
+	 * The View interface API
+	 */
+	var View = MarbleBar.View = function( kernel, hostDOM, specs ) {
+
+		// Initialize properties
+		this.id = specs.id;
+		this.kernel = kernel;
+		this.properties = [];
+		this.propertyIndex = { };
+
+		// Initialize tab DOMs
+		var eid = MarbleBar.new_id();
+		this.hostDOM = hostDOM;
+		this.tabDOM = $(' <li role="presentation"><a href="#'+eid+'" aria-controls="'+eid+'" role="tab" data-toggle="tab">'+specs.meta.title+'</a></li>')
+			.appendTo(hostDOM.find(".mb-gui-tabnav"));
+		this.bodyDOM = $('<div role="tabpanel" class="tab-pane mb-view" id="'+eid+'"></div>')
+			.appendTo(hostDOM.find(".mb-gui-tabpane"));
+
+		// Initialize property host
+		this.propertyDOM = $('<form class="form-horizontal"></form>').appendTo( this.bodyDOM );
+
+		// Create properties
+		for (var i=0; i<specs.properties.length; i++) {
+			this.createProperty( specs.properties[i] );
+		}
+
+	}
+
+	/**
+	 * Add a property in the view
+	 */
+	View.prototype.createProperty = function( specs ) {
+
+		// Instance property from specs
+		var widget_CLASS = Widgets[specs.widget || "text"],
+			widgetDOM = $('<div class="form-group mb-property"></div>').appendTo( this.propertyDOM );
+
+		// Check for errors
+		if (!widget_CLASS) {
+			console.error("[widget] Unknown widget '" + specs.widget + "'");
+			return;
+		}
+
+		// Create and initialize widget
+		var widget = new widget_CLASS( widgetDOM, specs );
+		widget.view = this;
+		widget.id = specs.id;
+
+		// Store on index
+		this.propertyIndex[ specs.id ] = widget;
+		this.properties.push( widget );
+
+		// Apply value
+		widget.update( specs.value );
+
+	}
+
+	/**
+	 * Add a property in the view
+	 */
+	View.prototype.updateProperty = function( id, value ) {
+		if (!this.propertyIndex[id]) return;
+		this.propertyIndex[id].update( value );
+	}
+
+	/**
+	 * Erase view properties
+	 */
+	View.prototype.wipe = function() {
+		for (var i=0; i<this.properties; i++) {
+
+		}
+		this.properties = [];
+	}
+
+	////////////////////////////////////////////////
 	// MarbleBar GUI API
 	////////////////////////////////////////////////
 
@@ -506,7 +375,7 @@ $(function() {
 	 */
 	var MarbleGUI = function( hostDOM ) {
 		var self = this;
-		Marblebar.call(this);
+		MarbleBar.call(this);
 
 		// Initialize properties
 		this.views = [];
@@ -531,7 +400,7 @@ $(function() {
 	};
 
 	// Subclass from MarbleBar
-	MarbleGUI.prototype = Object.create( Marblebar.prototype );
+	MarbleGUI.prototype = Object.create( MarbleBar.prototype );
 
 	/**
 	 * Add a MarbleBar View
@@ -596,9 +465,13 @@ $(function() {
 	// Initialization Hook
 	////////////////////////////////////////////////
 	
-	// Create a marblebar GUI API instance
-	window.marblebar = new MarbleGUI($("#mb-gui"));
-	// Connect and initialize
-	window.marblebar.connect();
+	$(function() {
 
-})
+		// Create a marbleBar GUI API instance
+		window.marbleBar = new MarbleGUI($("#mb-gui"));
+		// Connect and initialize
+		window.marbleBar.connect();
+
+	});
+
+})()

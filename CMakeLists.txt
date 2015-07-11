@@ -188,3 +188,8 @@ target_link_libraries ( ${PROJECT_NAME} ${PROJECT_LIBRARIES} )
 if (APPLE)
 	target_link_libraries ( ${PROJECT_NAME} ${FRAMEWORK_COCOA} )
 endif()
+
+# Expose useful information in the parent scope
+set( MarbleBar_LIBS ${PROJECT_NAME} PARENT_SCOPE)
+set( MarbleBar_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include ${PROJECT_INCLUDES} PARENT_SCOPE)
+
