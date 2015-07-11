@@ -1,14 +1,33 @@
 # The MarbleBar GUI
-A minimal footprint Web GUI library for C++11 with a tiny embedded web browser. I wrote this library because I wanted a cross-platform GUI without the need to drag along massive SDKs.
 
-The concept is very simple: The library includes a tiny webserver, it's static resources to serve and the core logic required in order to crate simple views. It comes complete, with bootstrap for nice GUIs (offline of course), and a modular appropach on writing custom widgets.
+Ever wanted a simple, quick, cross-platform GUI with no additional dependencies for your C++11 application? Was that UI mainly for providing some configuration or to see some results in real-time? Then say hello to MarbleBar!
+
+MarbleBar is a minimal footprint Web GUI library for C++11 with a tiny embedded web browser. I wrote this library because I wanted a cross-platform GUI without the need to drag along massive SDKs.
+
+The concept is very simple: The library includes a tiny web server, it's static resources to serve and the core logic required in order to crate simple views. It comes complete, with bootstrap for nice GUIs (offline of course), and a modular appropach on writing custom widgets.
+
+Don't expect to see something like (Wt)[http://www.webtoolkit.eu/]. There are no sessions, no complex widgets nor advanced lay-outing. There is only one session: your actual application.  
+
+## Building
+
+MarbleBar is statically built along with your project. If you are using `CMake`, you can integrate it in your project like this:
+
+```cmake
+# Before you define your target:
+add_subdirectory( "/path/to/marblebar/sources" marblebar )
+include_directories( ${MarbleBar_INCLUDE_DIRS} )
+
+# After you have defined your target:
+target_link_libraries( ${PROJECT_NAME} ${MarbleBar_LIBS} )
+```
+
+If you are not using CMake, well... currently you are on your own. (But definitely, have a look at CMake, it could make our life way easier!)
 
 ## Example
 
 Until I come with a complete documentation, have a look on this example:
 
 ```cpp
-
 #include <marblebar.hpp>
 #include <iostream>
 
@@ -30,8 +49,13 @@ int main(int argc, char ** argv) {
     PIntPtr p4 = view->addProperty( make_shared<PInt>("Range", 0) );
     PImagePtr p5 = view->addProperty( make_shared<PImage>("Preview", 128, -1, "about:blank") );
 
-    // You can access the underlaying property like any other
-    // propetty of the same type
+    // Most of the properies offer overloads that behave like
+    // a regular underlaying variable (ex. int, bool, string).
+    //
+    // Changes to these properties are instantly reflected in the UI
+    // and likewise, changes in the UI instantly affect the value of
+    // the properties.
+    //
     *p1 = "test";
     *p1 += "ing";
 
@@ -53,6 +77,21 @@ int main(int argc, char ** argv) {
 
     return 0;
 };
+```
+
+And here is an example `CMakeLists.txt` file for building that sample project:
+
+```cmake
+cmake_minimum_required (VERSION 2.8)
+project ( marblebar-example )
+# Include MarbleBar
+add_subdirectory( "/path/to/marblebar/sources" marblebar )
+include_directories( ${MarbleBar_INCLUDE_DIRS} )
+# Compile Project (With C++11)
+add_definitions(-std=c++11)
+add_executable( ${PROJECT_NAME} example.cpp )
+# Link MarbleBar
+target_link_libraries( ${PROJECT_NAME} ${MarbleBar_LIBS} )
 ```
 
 ## Quick Terminology Intro
