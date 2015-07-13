@@ -6,7 +6,7 @@ MarbleBar is a minimal footprint Web GUI library for C++11 with a tiny embedded 
 
 The concept is very simple: The library includes a tiny web server, it's static resources to serve and the core logic required in order to crate simple views. It comes complete, with Twitter Bootstrap for nice GUIs (offline of course), and a modular appropach on writing custom widgets.
 
-Don't expect to see something like [Wt](http://www.webtoolkit.eu/). Here there are no sessions, no complex widgets nor advanced lay-outing. As a trade-off to the simplicity you are given a single session (synchronised along all browser instances) and a property page layout. 
+Don't expect to see something like [Wt](http://www.webtoolkit.eu/). Here there are no sessions, no complex widgets nor advanced lay-outing. As a trade-off to the simplicity you are given a single session (synchronised along all browser instances) and a property page-based layout. 
 
 ## Building
 
@@ -107,45 +107,45 @@ The following property types are currently provided by the MarbleBar GUI:
         <th>Description</th>
     </tr>
     <tr>
-        <td><code>PBool</code></td>
-        <td><code>toggle</code></td>
-        <td><code>bool</code></td>
+        <th><code>mb::PBool</code></th>
+        <th>toggle</th>
+        <th>bool</th>
         <td>A boolean property represented by a toggle-able push button</td>
     </tr>
     <tr>
-        <td><code>PImage</code></td>
-        <td><code>image</code></td>
-        <td><code>string</code></td>
+        <th><code>mb::PImage</code></th>
+        <th>image</th>
+        <th>string</th>
         <td>An image field. The string value is the URL of the image. You can use the <code>setBinary()</code> method to define an image by it's contents.</td>
     </tr>
     <tr>
-        <td><code>PInt</code></td>
-        <td><code>slider</code></td>
-        <td><code>int</code></td>
+        <th><code>mb::PInt</code></th>
+        <th>slider</th>
+        <th>int</th>
         <td>An integer value that is selected by a slider.</td>
     </tr>
     <tr>
-        <td><code>PFloat</code></td>
-        <td><code>slider</code></td>
-        <td><code>float</code></td>
+        <th><code>mb::PFloat</code></th>
+        <th>slider</th>
+        <th>float</th>
         <td>An float value that is selected by a slider.</td>
     </tr>
     <tr>
-        <td><code>PDouble</code></td>
-        <td><code>slider</code></td>
-        <td><code>double</code></td>
+        <th><code>mb::PDouble</code></th>
+        <th>slider</th>
+        <th>double</th>
         <td>An double value that is selected by a slider.</td>
     </tr>
     <tr>
-        <td><code>PLabel</code></td>
-        <td><code>label</code></td>
-        <td><code>string</code></td>
+        <th><code>mb::PLabel</code></th>
+        <th>label</th>
+        <th>string</th>
         <td>A string value rendered with a non-editable text field.</td>
     </tr>
     <tr>
-        <td><code>PString</code></td>
-        <td><code>text</code></td>
-        <td><code>string</code></td>
+        <th><code>mb::PString</code></th>
+        <th>text</th>
+        <th>string</th>
         <td>A string value rendered with an editable text field.</td>
     </tr>
 </table>
