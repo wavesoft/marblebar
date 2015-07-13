@@ -68,11 +68,11 @@ namespace mb {
 		 * Add a property
 		 */
 		template<class T> 
-		shared_ptr<T> 				addProperty( shared_ptr<T> property ) 
+		shared_ptr<T> 				addProperty( shared_ptr<T> property, const string & groupTitle = "" ) 
 		{
 
 			// Add to default group
-			group("")->addProperty( property );
+			group(groupTitle)->addProperty( property );
 
 			// Pass-through
 			return property;

@@ -325,13 +325,21 @@
 		for (var group in specs.properties) {
 			if (!specs.properties.hasOwnProperty(group)) continue;
 			var props = specs.properties[group],
-				panelDOM = $('<div class="panel panel-default"></div>').appendTo( this.bodyDOM ),
-				headDOM = $('<div class="panel-heading"></div>').text(group).appendTo(panelDOM),
-				bodyDOM = $('<div class="panel-body"></div>').appendTo(panelDOM),
+				p_id = MarbleBar.new_id(),
+				b_id = MarbleBar.new_id(),
+				panelDOM = $('<div class="panel panel-default" id="'+p_id+'"></div>').appendTo( this.bodyDOM ),
+				headDOM = $('<div class="panel-heading"></div>').appendTo(panelDOM),
+				headTitle = $('<h4 class="panel-title"></div>').appendTo(headDOM),
+				collapseBtn = $('<a role="button" data-toggle="collapse" data-parent="#'+p_id+'" href="#'+b_id+'" aria-expanded="true" aria-controls="'+b_id+'"></button>').text(group).appendTo(headTitle),
+				bodyDOM = $('<div id="'+b_id+'" class="panel-body"></div>').appendTo(panelDOM),
 				formDOM = $('<form class="form-horizontal"></form>').appendTo( bodyDOM );
 
 			// Delete head panel if missing
-			if (group == "") headDOM.remove();
+			if (group == "") {
+				headDOM.remove();
+			} else {
+				bodyDOM.addClass("collapse");
+			}
 
 			// Create properties
 			for (var i=0; i<props.length; i++) {
