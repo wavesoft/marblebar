@@ -18,54 +18,70 @@
  * Contact: <ioannis.charalampidis[at]cern.ch>
  */
 
-#ifndef _MARBLEBAR_CALLBACKS_HPP_
-#define _MARBLEBAR_CALLBACKS_HPP_
+#ifndef _MARBLEBAR_PROPERTY_GROUP_HPP_
+#define _MARBLEBAR_PROPERTY_GROUP_HPP_
 
+#include <json/json.h>
 #include <string>
 #include <memory>
+#include <vector>
+#include <map>
 #include <functional>
- 
+
 using namespace std;
 
 namespace mb {
 
 	// Forward declarations
-	class Config;
-	typedef std::shared_ptr<Config> 	ConfigPtr;
-	typedef std::weak_ptr<Config> 		ConfigWeakPtr;
+	class PropertyGroup;
+	typedef std::shared_ptr<PropertyGroup> 	PropertyGroupPtr;
+	typedef std::weak_ptr<PropertyGroup> 	PropertyGroupWeakPtr;
+
+}
+
+// view.hpp depends on us, so we should define pointers first
+#include <marblebar/view.hpp>
+
+namespace mb {
 
 	/**
-	 * Return a default config instance
+	 * PropertyGroup base class from which widgets can derrive
 	 */
-	inline ConfigPtr defaultConfig()
-		{ return std::make_shared<Config>(); };
-
-	/**
-	 * Configuration class
-	 */
-	class Config {
+	class PropertyGroup : public enable_shared_from_this<PropertyGroup> {
 	public:
 
 		/**
-		 * Intiialize MarbleBar config
+		 * PropertyGroup constructor
 		 */
-		Config()
-			: webserverPort( 15234 )
-		{ }
+		PropertyGroup( const string & title, const ViewPtr & view )
+		: properties(), view(view), title(title) { }
+		
+		/**
+		 * Add a property
+		 */
+		template<class T> 
+		shared_ptr<T> 				addProperty( shared_ptr<T> property );
+
+	public:
 
 		/**
-		 * The server version
+		 * The group title
 		 */
-		const string version 	= "0.0.1";
+		string						title;
 
 		/**
-		 * The port to listen at
+		 * The parent view 
 		 */
-		int webserverPort;
+		ViewPtr						view;
+
+		/**
+		 * List of properties
+		 */
+		vector< PropertyPtr >		properties;
 
 	};
 
 };
 
 
-#endif /* _MARBLEBAR_CALLBACKS_HPP_ */
+#endif /* _MARBLEBAR_PROPERTY_GROUP_HPP_ */

@@ -61,47 +61,42 @@ namespace mb {
 		/**
 		 * Attach to a view
 		 */
-		void 				attach( const ViewPtr& view, const string & id );
+		void 					attach( const ViewPtr& view, const string & id );
 
 		/**
 		 * Mark property value as dirty
 		 */
-		void				markAsDirty();
+		void					markAsDirty();
 
 		/**
 		 * Receive a UI event
 		 */
-		void 				receiveUIEvent( const string & event, const Json::Value & data );
+		void 					receiveUIEvent( const string & event, const Json::Value & data );
 
 		/**
 		 * Update a metadata field
 		 */
-		PropertyPtr 		meta( const string & property, const Json::Value & value );
+		PropertyPtr 			meta( const string & property, const Json::Value & value );
 
 		/**
 		 * Register an event handler
 		 */
-		PropertyPtr 		on( const string & event, EventCallback callback );
-
-		/**
-		 * Unregister an event handler
-		 */
-		PropertyPtr 		off( const string & event, EventCallback callback );
+		PropertyPtr 			on( const string & event, EventCallback callback );
 
 		/**
 		 * Overridable function to apply a property change to it's contents
 		 */
-		virtual void 		handleUIEvent( const string & event, const Json::Value & data ) { };
+		virtual void 			handleUIEvent( const string & event, const Json::Value & data ) { };
 
 		/**
 		 * Overridable function to render the property value to a JSON value
 		 */
-		virtual Json::Value getUIValue() = 0;
+		virtual Json::Value 	getUIValue() = 0;
 
 		/**
 		 * Overridable function to return property specifications for the js UI
 		 */
-		virtual Json::Value getUISpecs();
+		virtual Json::Value 	getUISpecs();
 
 	public:
 

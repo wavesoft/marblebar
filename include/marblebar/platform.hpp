@@ -28,7 +28,7 @@ namespace mb {
 	/**
 	 * Open the platform webbrowser pointing to the GUI
 	 */
-	void		openGUIURL( ConfigPtr config );
+	void						openGUIURL( ConfigPtr config );
 
 }
 

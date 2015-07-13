@@ -118,20 +118,12 @@ void Session::handleEvent( const string& id, const string& event, const Json::Va
 			if (view->id == viewName) {
 
 				// Locate property with specified ID
-				for (auto jt = view->properties.begin(); jt != view->properties.end(); jt++) {
-					PropertyPtr prop = *jt;
-
-					// Find property
-					if (prop->id == propName) {
-
-						// Handle event by the property
-						prop->receiveUIEvent( event, data["data"] );
-
-						// Do not continue
-						return;
-
-					}
-
+				PropertyPtr prop = view->propertyById( propName );
+				if (prop) {
+					// Handle event by the property
+					prop->receiveUIEvent( event, data["data"] );
+					// Do not continue
+					return;
 				}
 
 				// Property not found

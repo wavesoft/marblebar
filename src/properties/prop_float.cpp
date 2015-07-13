@@ -24,7 +24,7 @@ using namespace mb;
 /**
  * PFloat Constructor
  */
-PFloat::PFloat( const string & title, const float defaultValue )
+PFloat::PFloat( const string & title, const float defaultValue, const float min, const float max, const float step )
  : Property(), value(defaultValue)
 {
 	metadata["title"] = title;

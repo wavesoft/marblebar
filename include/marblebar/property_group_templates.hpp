@@ -18,26 +18,44 @@
  * Contact: <ioannis.charalampidis[at]cern.ch>
  */
 
-#ifndef _MARBLEBAR_HPP_
-#define _MARBLEBAR_HPP_
+#ifndef _MARBLEBAR_PROPERTY_GROUP_TPL_HPP_
+#define _MARBLEBAR_PROPERTY_GROUP_TPL_HPP_
 
-// Include MarbleBar Kernel
-#include <marblebar/config.hpp>
-#include <marblebar/property.hpp>
-#include <marblebar/view.hpp>
-#include <marblebar/kernel.hpp>
-#include <marblebar/session.hpp>
+#include <json/json.h>
+#include <string>
+#include <memory>
+#include <vector>
+#include <map>
+#include <functional>
 
-// Include template implementations
-#include <marblebar/property_group_templates.hpp>
+using namespace std;
 
-// Include properties
-#include <marblebar/properties/string.hpp>
-#include <marblebar/properties/label.hpp>
-#include <marblebar/properties/bool.hpp>
-#include <marblebar/properties/int.hpp>
-#include <marblebar/properties/float.hpp>
-#include <marblebar/properties/double.hpp>
-#include <marblebar/properties/image.hpp>
+// view.hpp depends on us, so we should define pointers first
+#include <marblebar/property_group.hpp>
 
-#endif /* _MARBLEBAR_HPP_ */
+namespace mb {
+
+	/**
+	 * Define the template function
+	 */
+	template<class T> 
+	shared_ptr<T> PropertyGroup::addProperty( shared_ptr<T> property ) 
+	{
+
+		// Create property
+		properties.push_back(
+				dynamic_pointer_cast<Property>( property )
+			);
+
+		// Attach to this
+		property->attach( view, view->getNextPropertyID() );
+
+		// Pass-through
+		return property;
+
+	}
+
+};
+
+
+#endif /* _MARBLEBAR_PROPERTY_GROUP_TPL_HPP_ */

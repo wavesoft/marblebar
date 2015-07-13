@@ -102,49 +102,49 @@ The following property types are currently provided by the MarbleBar GUI:
 <table>
     <tr>
         <th>Class</th>
-        <th>Widget</th>
+        <td>Widget</td>
         <th>Internal type</th>
         <th>Description</th>
     </tr>
     <tr>
         <th><code>mb::PBool</code></th>
-        <th>toggle</th>
+        <td>toggle</td>
         <th>bool</th>
         <td>A boolean property represented by a toggle-able push button</td>
     </tr>
     <tr>
         <th><code>mb::PImage</code></th>
-        <th>image</th>
+        <td>image</td>
         <th>string</th>
         <td>An image field. The string value is the URL of the image. You can use the <code>setBinary()</code> method to define an image by it's contents.</td>
     </tr>
     <tr>
         <th><code>mb::PInt</code></th>
-        <th>slider</th>
+        <td>slider</td>
         <th>int</th>
         <td>An integer value that is selected by a slider.</td>
     </tr>
     <tr>
         <th><code>mb::PFloat</code></th>
-        <th>slider</th>
+        <td>slider</td>
         <th>float</th>
         <td>An float value that is selected by a slider.</td>
     </tr>
     <tr>
         <th><code>mb::PDouble</code></th>
-        <th>slider</th>
+        <td>slider</td>
         <th>double</th>
         <td>An double value that is selected by a slider.</td>
     </tr>
     <tr>
         <th><code>mb::PLabel</code></th>
-        <th>label</th>
+        <td>label</td>
         <th>string</th>
         <td>A string value rendered with a non-editable text field.</td>
     </tr>
     <tr>
         <th><code>mb::PString</code></th>
-        <th>text</th>
+        <td>text</td>
         <th>string</th>
         <td>A string value rendered with an editable text field.</td>
     </tr>

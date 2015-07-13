@@ -26,9 +26,22 @@ using namespace mb;
  * Marblebar View constructor
  */
 View::View( const string & title ) : 
-	attached(false), id(""), properties(), metadata(), lastPropertyID(0)
+	attached(false), id(""), propertyGroups(), metadata(), lastPropertyID(0)
 {
 	metadata["title"] = title;
+}
+
+/**
+ * Create/Return a property group
+ */
+PropertyGroupPtr View::group( const string& title )
+{
+	// Create if missing
+	if (propertyGroups.find(title) == propertyGroups.end()) {
+		propertyGroups[title] = make_shared<PropertyGroup>( title, shared_from_this() );
+	}
+	// Return
+	return propertyGroups[title];
 }
 
 /**
@@ -40,25 +53,6 @@ void View::attach( const KernelPtr& kernel, const string& id )
 	this->id = id;
 	this->attached = true;
 }
-
-/**
- * Marblebar View constructor
- */
-// ViewPtr View::addProperty( PropertyPtr property )
-// {
-// 	// Do not do anything unless attached
-// 	if (!this->attached) return shared_from_this();
-
-// 	// Attach property to me
-// 	property->attach( shared_from_this() );
-
-// 	// Keep property
-// 	properties.push_back( property );
-
-// 	// Return instance for chain-calling
-// 	return shared_from_this();
-
-// }
 
 /**
  * Set a metadata property
@@ -93,14 +87,21 @@ Json::Value View::getUISpecs()
 	if (!this->attached) return Json::Value();
 
 	// Get View ID
-	Json::Value value, prop, specs;
+	Json::Value value, specs, groups;
 	value["id"] = id;
 
-	// Iterate over properties and collect specs
-	for (auto it = properties.begin(); it != properties.end(); ++it) {
-		prop.append( (*it)->getUISpecs() );
+	// Iterate over property groups
+	for (auto it = propertyGroups.begin(); it != propertyGroups.end(); ++it) {
+		Json::Value prop;
+		for (auto jt = (*it).second->properties.begin(); jt != (*it).second->properties.end(); ++jt) {
+			prop.append( (*jt)->getUISpecs() );
+		}
+
+		// Store group
+		groups[(*it).second->title] = prop;
 	}
-	value["properties"] = prop;
+
+	value["properties"] = groups;
 	value["meta"] = metadata;
 
 	// Return specifications
@@ -118,4 +119,22 @@ string View::getNextPropertyID()
 	oss << "p" << (++lastPropertyID);
 	// Return view-index
 	return oss.str();
+}
+
+/**
+ * Return a property by it's ID
+ */
+PropertyPtr View::propertyById( const string& id )
+{
+	// Iterate over property groups
+	for (auto it = propertyGroups.begin(); it != propertyGroups.end(); ++it) {
+		// Iterate over their properties
+		for (auto jt = (*it).second->properties.begin(); jt != (*it).second->properties.end(); ++jt) {
+			// Compare IDs
+			if ((*jt)->id == id)
+				return *jt;
+		}
+	}
+	// Return nothing
+	return PropertyPtr();
 }

@@ -321,9 +321,22 @@
 		// Initialize property host
 		this.propertyDOM = $('<form class="form-horizontal"></form>').appendTo( this.bodyDOM );
 
-		// Create properties
-		for (var i=0; i<specs.properties.length; i++) {
-			this.createProperty( specs.properties[i] );
+		// Create property groups and their properties
+		for (var group in specs.properties) {
+			if (!specs.properties.hasOwnProperty(group)) continue;
+			var props = specs.properties[group],
+				panelDOM = $('<div class="panel panel-default"></div>').appendTo( this.bodyDOM ),
+				headDOM = $('<div class="panel-heading"></div>').text(group).appendTo(panelDOM),
+				bodyDOM = $('<div class="panel-body"></div>').appendTo(panelDOM),
+				formDOM = $('<form class="form-horizontal"></form>').appendTo( bodyDOM );
+
+			// Delete head panel if missing
+			if (group == "") headDOM.remove();
+
+			// Create properties
+			for (var i=0; i<props.length; i++) {
+				this.createProperty( props[i], formDOM );
+			}
 		}
 
 	}
@@ -331,11 +344,11 @@
 	/**
 	 * Add a property in the view
 	 */
-	View.prototype.createProperty = function( specs ) {
+	View.prototype.createProperty = function( specs, host ) {
 
 		// Instance property from specs
 		var widget_CLASS = Widgets[specs.widget || "text"],
-			widgetDOM = $('<div class="form-group mb-property"></div>').appendTo( this.propertyDOM );
+			widgetDOM = $('<div class="form-group mb-property"></div>').appendTo( host );
 
 		// Check for errors
 		if (!widget_CLASS) {
@@ -353,7 +366,9 @@
 		this.properties.push( widget );
 
 		// Apply value
-		widget.update( specs.value );
+		try {
+			widget.update( specs.value );
+		} catch (e) { }
 
 	}
 
@@ -362,7 +377,11 @@
 	 */
 	View.prototype.updateProperty = function( id, value ) {
 		if (!this.propertyIndex[id]) return;
-		this.propertyIndex[id].update( value );
+
+		// Apply value
+		try {
+			this.propertyIndex[id].update( value );
+		} catch(e) { };
 	}
 
 	/**
@@ -445,7 +464,9 @@
 		if (!this.viewIndex[id]) return;
 		if (!this.viewIndex[id].propertyIndex[prop]) return;
 		// Apply value changes
-		this.viewIndex[id].propertyIndex[prop].update( value );
+		try {
+			this.viewIndex[id].propertyIndex[prop].update( value );
+		} catch (e) { };
 	}
 
 	/**

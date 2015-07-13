@@ -33,14 +33,16 @@ namespace mb {
 	class View;
 	typedef std::shared_ptr<View> 	ViewPtr;
 	typedef std::weak_ptr<View> 	ViewWeakPtr;
+
 }
 
 // property.hpp & kernel.hpp depends on us, so we should define pointers first
 #include <marblebar/property.hpp>
+#include <marblebar/property_group.hpp>
 #include <marblebar/kernel.hpp>
 
 namespace mb {
-	
+
 	/**
 	 * MarbleBar View
 	 */
@@ -58,24 +60,29 @@ namespace mb {
 		void 						attach( const KernelPtr& kernel, const string & id );
 
 		/**
+		 * Create/Return a property group
+		 */
+		PropertyGroupPtr			group( const string& title );
+
+		/**
 		 * Add a property
 		 */
 		template<class T> 
 		shared_ptr<T> 				addProperty( shared_ptr<T> property ) 
 		{
 
-			// Create property
-			properties.push_back(
-					dynamic_pointer_cast<Property>( property )
-				);
-
-			// Attach to this
-			property->attach( shared_from_this(), getNextPropertyID() );
+			// Add to default group
+			group("")->addProperty( property );
 
 			// Pass-through
 			return property;
 
 		}
+
+		/**
+		 * Return a property by it's ID
+		 */
+		PropertyPtr 				propertyById( const string& id );
 
 		/**
 		 * Mark a particular property as dirty
@@ -103,12 +110,12 @@ namespace mb {
 		 * The unique session ID for this instance
 		 */
 		string 						id;
-
-		/**
-		 * List of properties
-		 */
-		vector< PropertyPtr >		properties;
 		
+		/**
+		 * List of property groups
+		 */
+		map< string, PropertyGroupPtr >	propertyGroups;
+
 		/**
 		 * Metatada information
 		 */

@@ -81,7 +81,7 @@ namespace mb {
 		/**
 		 * Session kernel
 		 */
-		KernelPtr kernel;
+		KernelPtr 				kernel;
 
 	};
 

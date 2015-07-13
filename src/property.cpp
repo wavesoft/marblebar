@@ -60,30 +60,6 @@ PropertyPtr Property::on( const string & event, EventCallback callback )
 }
 
 /**
- * Unregister an event handler
- */
-PropertyPtr Property::off( const string & event, EventCallback callback )
-{
-	// Create a vector of event callbacks
-	if (eventCallbacks.find(event) == eventCallbacks.end())
-		return shared_from_this();
-
-	// Lookup item
-	vector< EventCallback >::iterator i = find(
-		eventCallbacks[event].begin(),
-		eventCallbacks[event].end(),
-		callback );
-	if (i == eventCallbacks[event].end())
-		return shared_from_this();
-
-	// Delete item
-	eventCallbacks[event].erase(i);
-
-	// Return this for chain calling
-	return shared_from_this();
-}
-
-/**
  * Marblebar Property constructor
  */
 void Property::attach( const ViewPtr& view, const string & id )
