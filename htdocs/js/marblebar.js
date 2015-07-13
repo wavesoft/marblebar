@@ -468,6 +468,11 @@
 		this.hostDOM.append(
 			$('<div class="alert alert-danger" role="alert"><strong>Disconnected from application</strong>. The application might have stopped or the connection with the application was interrupted. Try refreshing and if the problem insists restart the application.</div>')
 		);
+
+		// Close window
+		window.open('','_self','');
+        window.close();
+
 	}
 
 	////////////////////////////////////////////////

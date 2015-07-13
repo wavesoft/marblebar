@@ -18,8 +18,8 @@
  * Contact: <ioannis.charalampidis[at]cern.ch>
  */
 
-#ifndef _MARBLEBAR_PROP_LABEL_HPP_
-#define _MARBLEBAR_PROP_LABEL_HPP_
+#ifndef _MARBLEBAR_PROP_DOUBLE_HPP_
+#define _MARBLEBAR_PROP_DOUBLE_HPP_
 
 #include <json/json.h>
 #include <string>
@@ -33,20 +33,20 @@ using namespace std;
 namespace mb {
 
 	// Forward declarations
-	class PLabel;
-	typedef std::shared_ptr<PLabel> 	PLabelPtr;
-	typedef std::weak_ptr<PLabel> 		PLabelWeakPtr;
+	class PDouble;
+	typedef std::shared_ptr<PDouble> 	PDoublePtr;
+	typedef std::weak_ptr<PDouble> 		PDoubleWeakPtr;
 
 	/**
 	 * Property base class from which widgets can derrive
 	 */
-	class PLabel : public Property {
+	class PDouble : public Property {
 	public:
 
 		/**
 		 * Initialize a MarbleBar property
 		 */
-		PLabel( const string & title, const string & defaultValue = "");
+		PDouble( const string & title, const double defaultValue = 0.0, const double min = 0.0, const double max = 65535, const double step = 0.1 );
 
 		/**
 		 * Overridable function to apply a property change to it's contents
@@ -66,36 +66,38 @@ namespace mb {
 	public:
 
 		/**
-		 * Static cast to string
+		 * Static cast to double point number
 		 */
-		operator string() const;
+		operator double() const;
 
 		/**
 		 * Assign operator
 		 */
-		PLabel & operator= ( const string & str );
-		PLabel & operator= ( const char* str );
-		template<typename T> PLabel & operator= ( T num )
-			{ value = std::to_string(num); this->markAsDirty(); return *this; }
+		PDouble & operator= ( const double & str );
+		PDouble & operator= ( double str );
 
 		/**
-		 * Append operator
+		 * Mathematical operations
 		 */
-		PLabel & operator+= ( const string & str );
-		PLabel & operator+= ( const char* str );
-		template<typename T> PLabel & operator+= ( T num )
-			{ value = std::to_string(num); this->markAsDirty(); return *this; }
+		PDouble & operator+= ( const double & str );
+		PDouble & operator+= ( double str );
+		PDouble & operator-= ( const double & str );
+		PDouble & operator-= ( double str );
+		PDouble & operator/= ( const double & str );
+		PDouble & operator/= ( double str );
+		PDouble & operator*= ( const double & str );
+		PDouble & operator*= ( double str );
 
 	private:
 
 		/**
 		 * The internal property
 		 */
-		string 				value;
+		double 				value;
 
 	};
 
 };
 
 
-#endif /* _MARBLEBAR_PROP_LABEL_HPP_ */
+#endif /* _MARBLEBAR_PROP_DOUBLE_HPP_ */

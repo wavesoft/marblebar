@@ -19,13 +19,16 @@
  */
 
 #include "marblebar/property.hpp"
+#include <algorithm>
+
 using namespace mb;
+using namespace std;
 
 /**
  * Property constructor
  */
 Property::Property()
- : metadata(), attached(false)
+ : metadata(), attached(false), eventCallbacks()
 { }
 
 /**
@@ -36,6 +39,47 @@ PropertyPtr Property::meta( const string & property, const Json::Value & value )
 	// Update property
 	metadata[property] = value;
 	// Return instance for chaining calls
+	return shared_from_this();
+}
+
+/**
+ * Register an event handler
+ */
+PropertyPtr Property::on( const string & event, EventCallback callback )
+{
+	// Create a vector of event callbacks
+	if (eventCallbacks.find(event) == eventCallbacks.end()) {
+		eventCallbacks[event] = vector< EventCallback >();
+	}
+
+	// Register event callback
+	eventCallbacks[event].push_back( callback );
+
+	// Return this for chain calling
+	return shared_from_this();
+}
+
+/**
+ * Unregister an event handler
+ */
+PropertyPtr Property::off( const string & event, EventCallback callback )
+{
+	// Create a vector of event callbacks
+	if (eventCallbacks.find(event) == eventCallbacks.end())
+		return shared_from_this();
+
+	// Lookup item
+	vector< EventCallback >::iterator i = find(
+		eventCallbacks[event].begin(),
+		eventCallbacks[event].end(),
+		callback );
+	if (i == eventCallbacks[event].end())
+		return shared_from_this();
+
+	// Delete item
+	eventCallbacks[event].erase(i);
+
+	// Return this for chain calling
 	return shared_from_this();
 }
 
@@ -72,4 +116,23 @@ Json::Value Property::getUISpecs()
 	data["value"] = getUIValue();
 	data["meta"] = metadata;
 	return data;
+}
+
+/**
+ * Overridable function to apply a property change to it's contents
+ */
+void Property::receiveUIEvent( const string & event, const Json::Value & data )
+{
+
+	// Forward to the
+	handleUIEvent( event, data );
+
+	// Lookup listeners
+	if (eventCallbacks.find(event) == eventCallbacks.end())
+		return;
+
+	// Trigger them
+	for (auto it = eventCallbacks[event].begin(); it != eventCallbacks[event].end(); ++it)
+		(*it)( data );
+
 }

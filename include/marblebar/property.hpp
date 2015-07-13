@@ -24,6 +24,9 @@
 #include <json/json.h>
 #include <string>
 #include <memory>
+#include <vector>
+#include <map>
+#include <functional>
 
 using namespace std;
 
@@ -33,6 +36,10 @@ namespace mb {
 	class Property;
 	typedef std::shared_ptr<Property> 	PropertyPtr;
 	typedef std::weak_ptr<Property> 	PropertyWeakPtr;
+
+	// Event handling function
+	typedef std::function<void ( const Json::Value & args )>	EventCallback;
+
 }
 
 // view.hpp depends on us, so we should define pointers first
@@ -62,14 +69,29 @@ namespace mb {
 		void				markAsDirty();
 
 		/**
+		 * Receive a UI event
+		 */
+		void 				receiveUIEvent( const string & event, const Json::Value & data );
+
+		/**
 		 * Update a metadata field
 		 */
 		PropertyPtr 		meta( const string & property, const Json::Value & value );
 
 		/**
+		 * Register an event handler
+		 */
+		PropertyPtr 		on( const string & event, EventCallback callback );
+
+		/**
+		 * Unregister an event handler
+		 */
+		PropertyPtr 		off( const string & event, EventCallback callback );
+
+		/**
 		 * Overridable function to apply a property change to it's contents
 		 */
-		virtual void 		handleUIEvent( const string & event, const Json::Value & data ) = 0;
+		virtual void 		handleUIEvent( const string & event, const Json::Value & data ) { };
 
 		/**
 		 * Overridable function to render the property value to a JSON value
@@ -104,6 +126,11 @@ namespace mb {
 		 * Flag if this view is attached
 		 */
 		bool 			attached;
+
+		/**
+		 * List of event callbacks
+		 */
+		map< string, vector< EventCallback > > eventCallbacks;
 
 	};
 

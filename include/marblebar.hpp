@@ -32,6 +32,8 @@
 #include <marblebar/properties/label.hpp>
 #include <marblebar/properties/bool.hpp>
 #include <marblebar/properties/int.hpp>
+#include <marblebar/properties/float.hpp>
+#include <marblebar/properties/double.hpp>
 #include <marblebar/properties/image.hpp>
 
 #endif /* _MARBLEBAR_HPP_ */

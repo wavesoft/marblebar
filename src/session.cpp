@@ -125,7 +125,7 @@ void Session::handleEvent( const string& id, const string& event, const Json::Va
 					if (prop->id == propName) {
 
 						// Handle event by the property
-						prop->handleUIEvent( event, data["data"] );
+						prop->receiveUIEvent( event, data["data"] );
 
 						// Do not continue
 						return;

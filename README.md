@@ -1,12 +1,12 @@
-# The MarbleBar GUI
+# The MarbleBar GUI (Alpha)
 
 Ever wanted a simple, quick, cross-platform GUI with no additional dependencies for your C++11 application? Was that UI mainly for providing some configuration or to see some results in real-time? Then say hello to MarbleBar!
 
 MarbleBar is a minimal footprint Web GUI library for C++11 with a tiny embedded web browser. I wrote this library because I wanted a cross-platform GUI without the need to drag along massive SDKs.
 
-The concept is very simple: The library includes a tiny web server, it's static resources to serve and the core logic required in order to crate simple views. It comes complete, with bootstrap for nice GUIs (offline of course), and a modular appropach on writing custom widgets.
+The concept is very simple: The library includes a tiny web server, it's static resources to serve and the core logic required in order to crate simple views. It comes complete, with Twitter Bootstrap for nice GUIs (offline of course), and a modular appropach on writing custom widgets.
 
-Don't expect to see something like [Wt](http://www.webtoolkit.eu/). There are no sessions, no complex widgets nor advanced lay-outing. There is only one session: your actual application.  
+Don't expect to see something like [Wt](http://www.webtoolkit.eu/). There are no sessions, no complex widgets nor advanced lay-outing. 
 
 ## Building
 
@@ -30,6 +30,7 @@ Until I come with a complete documentation, have a look on this example:
 ```cpp
 #include <marblebar.hpp>
 #include <iostream>
+#include <thread>
 
 using namespace mb;
 using namespace std;
@@ -73,7 +74,7 @@ int main(int argc, char ** argv) {
 
     // Optionally you might wish to start the kernel thread
     // in a different thread, and to run it's start() method
-    kernel->start();
+    thread kernelThread( &mb::Kernel::start, marbleKernel );
 
     return 0;
 };
@@ -93,6 +94,61 @@ add_executable( ${PROJECT_NAME} example.cpp )
 # Link MarbleBar
 target_link_libraries( ${PROJECT_NAME} ${MarbleBar_LIBS} )
 ```
+
+## Built-in properties
+
+The following property types are currently provided by the MarbleBar GUI:
+
+<table>
+    <tr>
+        <th>Class</th>
+        <th>Widget</th>
+        <th>Internal type</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td><code>PBool</code></td>
+        <td><code>toggle</code></td>
+        <td><code>bool</code></td>
+        <td>A boolean property represented by a toggle-able push button</td>
+    </tr>
+    <tr>
+        <td><code>PImage</code></td>
+        <td><code>image</code></td>
+        <td><code>string</code></td>
+        <td>An image field. The string value is the URL of the image. You can use the <code>setBinary()</code> method to define an image by it's contents.</td>
+    </tr>
+    <tr>
+        <td><code>PInt</code></td>
+        <td><code>slider</code></td>
+        <td><code>int</code></td>
+        <td>An integer value that is selected by a slider.</td>
+    </tr>
+    <tr>
+        <td><code>PFloat</code></td>
+        <td><code>slider</code></td>
+        <td><code>float</code></td>
+        <td>An float value that is selected by a slider.</td>
+    </tr>
+    <tr>
+        <td><code>PDouble</code></td>
+        <td><code>slider</code></td>
+        <td><code>double</code></td>
+        <td>An double value that is selected by a slider.</td>
+    </tr>
+    <tr>
+        <td><code>PLabel</code></td>
+        <td><code>label</code></td>
+        <td><code>string</code></td>
+        <td>A string value rendered with a non-editable text field.</td>
+    </tr>
+    <tr>
+        <td><code>PString</code></td>
+        <td><code>text</code></td>
+        <td><code>string</code></td>
+        <td>A string value rendered with an editable text field.</td>
+    </tr>
+</table>
 
 ## Quick Terminology Intro
 

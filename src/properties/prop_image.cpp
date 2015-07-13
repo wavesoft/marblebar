@@ -60,7 +60,7 @@ Json::Value PImage::getUISpecs()
 {
 	Json::Value data;
 	data["id"] = id;
-	data["widget"] = "image";
+	data["widget"] = "slider";
 	data["value"] = value;
 	data["meta"] = metadata;
 	return data;

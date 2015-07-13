@@ -75,12 +75,16 @@ namespace mb {
 		 */
 		PString & operator= ( const string & str );
 		PString & operator= ( const char* str );
+		template<typename T> PString & operator= ( T num )
+			{ value = std::to_string(num); this->markAsDirty(); return *this; }
 
 		/**
 		 * Append operator
 		 */
 		PString & operator+= ( const string & str );
 		PString & operator+= ( const char* str );
+		template<typename T> PString & operator+= ( T num )
+			{ value += std::to_string(num); this->markAsDirty(); return *this; }
 
 	private:
 

@@ -1,4 +1,35 @@
 /**
+ * [button] A clickable Widget
+ */
+MarbleBar.Widgets['button'] = MarbleBar.Widget.create(
+
+	// Constructor
+	function( hostDOM, specs ) {
+
+		// Initialize widget
+		var id = MarbleBar.new_id();
+		this.label = $('<label class="col-sm-2 control-label" for="'+id+'"></label>').text( specs['meta']['title'] ).appendTo( hostDOM );
+		this.button = $('<button class="btn'+(specs['meta']['class'] || "")+'" id="'+id+'"></button>').appendTo(
+			$('<div class="col-sm-10"></div>').appendTo(hostDOM)
+		);
+
+		// Click
+		this.button.click((function() {
+			this.trigger("click");
+		}).bind(this));
+
+	},{
+
+		// Update widget value
+		update: function(value) {
+			// Update label's contents
+			this.button.html(value);
+		}
+
+	}
+);
+
+/**
  * [label] A Read-only text widget
  */
 MarbleBar.Widgets['label'] = MarbleBar.Widget.create(
@@ -164,10 +195,8 @@ MarbleBar.Widgets['image'] = MarbleBar.Widget.create(
 		// Initialize widget
 		var id = MarbleBar.new_id();
 		this.label = $('<label class="col-sm-2 control-label" for="'+id+'"></label>').text( specs['meta']['title'] ).appendTo( hostDOM );
-		this.img = $('<img id="'+id+'" src="" />').appendTo(
-			$('<div class="well well-sm"></div>').appendTo(
-				$('<div class="col-sm-10"></div>').appendTo(hostDOM)
-			)
+		this.img = $('<img class="img-thumbnail" id="'+id+'" src="" />').appendTo(
+			$('<div class="col-sm-10"></div>').appendTo(hostDOM)
 		);
 
 		// Apply width/height if defined

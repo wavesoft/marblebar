@@ -83,7 +83,7 @@ namespace mb {
 		 */
 		void 				setBinary( const unsigned char * buffer, size_t len, const string & contentType );
 
-	private:
+	protected:
 
 		/**
 		 * The internal property

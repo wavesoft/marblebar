@@ -18,8 +18,8 @@
  * Contact: <ioannis.charalampidis[at]cern.ch>
  */
 
-#ifndef _MARBLEBAR_PROP_LABEL_HPP_
-#define _MARBLEBAR_PROP_LABEL_HPP_
+#ifndef _MARBLEBAR_PROP_FLOAT_HPP_
+#define _MARBLEBAR_PROP_FLOAT_HPP_
 
 #include <json/json.h>
 #include <string>
@@ -33,20 +33,20 @@ using namespace std;
 namespace mb {
 
 	// Forward declarations
-	class PLabel;
-	typedef std::shared_ptr<PLabel> 	PLabelPtr;
-	typedef std::weak_ptr<PLabel> 		PLabelWeakPtr;
+	class PFloat;
+	typedef std::shared_ptr<PFloat> 	PFloatPtr;
+	typedef std::weak_ptr<PFloat> 		PFloatWeakPtr;
 
 	/**
 	 * Property base class from which widgets can derrive
 	 */
-	class PLabel : public Property {
+	class PFloat : public Property {
 	public:
 
 		/**
 		 * Initialize a MarbleBar property
 		 */
-		PLabel( const string & title, const string & defaultValue = "");
+		PFloat( const string & title, const float defaultValue = 0.0, const float min = 0.0, const float max = 65535, const float step = 0.1 );
 
 		/**
 		 * Overridable function to apply a property change to it's contents
@@ -66,36 +66,38 @@ namespace mb {
 	public:
 
 		/**
-		 * Static cast to string
+		 * Static cast to floating point number
 		 */
-		operator string() const;
+		operator float() const;
 
 		/**
 		 * Assign operator
 		 */
-		PLabel & operator= ( const string & str );
-		PLabel & operator= ( const char* str );
-		template<typename T> PLabel & operator= ( T num )
-			{ value = std::to_string(num); this->markAsDirty(); return *this; }
+		PFloat & operator= ( const float & str );
+		PFloat & operator= ( float str );
 
 		/**
-		 * Append operator
+		 * Mathematical operations
 		 */
-		PLabel & operator+= ( const string & str );
-		PLabel & operator+= ( const char* str );
-		template<typename T> PLabel & operator+= ( T num )
-			{ value = std::to_string(num); this->markAsDirty(); return *this; }
+		PFloat & operator+= ( const float & str );
+		PFloat & operator+= ( float str );
+		PFloat & operator-= ( const float & str );
+		PFloat & operator-= ( float str );
+		PFloat & operator/= ( const float & str );
+		PFloat & operator/= ( float str );
+		PFloat & operator*= ( const float & str );
+		PFloat & operator*= ( float str );
 
 	private:
 
 		/**
 		 * The internal property
 		 */
-		string 				value;
+		float 				value;
 
 	};
 
 };
 
 
-#endif /* _MARBLEBAR_PROP_LABEL_HPP_ */
+#endif /* _MARBLEBAR_PROP_FLOAT_HPP_ */
