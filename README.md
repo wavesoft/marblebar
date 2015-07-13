@@ -6,7 +6,7 @@ MarbleBar is a minimal footprint Web GUI library for C++11 with a tiny embedded 
 
 The concept is very simple: The library includes a tiny web server, it's static resources to serve and the core logic required in order to crate simple views. It comes complete, with Twitter Bootstrap for nice GUIs (offline of course), and a modular appropach on writing custom widgets.
 
-Don't expect to see something like [Wt](http://www.webtoolkit.eu/). There are no sessions, no complex widgets nor advanced lay-outing. 
+Don't expect to see something like [Wt](http://www.webtoolkit.eu/). Here there are no sessions, no complex widgets nor advanced lay-outing. As a trade-off to the simplicity you are given a single session (synchronised along all browser instances) and a property page layout. 
 
 ## Building
 
