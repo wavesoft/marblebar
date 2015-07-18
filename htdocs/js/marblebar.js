@@ -321,6 +321,11 @@
 		// Initialize property host
 		this.propertyDOM = $('<form class="form-horizontal"></form>').appendTo( this.bodyDOM );
 
+		// Update view activate
+		this.tabDOM.find("a").click((function(e) {
+			this.kernel.sendEvent( "view/activate", { 'view': this.id } );
+		}).bind(this));
+
 		// Create property groups and their properties
 		for (var group in specs.properties) {
 			if (!specs.properties.hasOwnProperty(group)) continue;

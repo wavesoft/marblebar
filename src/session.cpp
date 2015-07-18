@@ -27,7 +27,7 @@ using namespace mb;
  * Marblebar Session constructor
  */
 Session::Session( KernelPtr kernel, const string& domain, const string uri ) : 
-	kernel(kernel), WebserverConnection( domain, uri )
+	kernel(kernel), WebserverConnection( domain, uri ), activeView()
 { }
 
 /**
@@ -37,6 +37,9 @@ void Session::notifyViewAdded( ViewPtr view )
 {
 	// Trigger view add
 	sendAction( "view/add", view->getUISpecs() );
+	// Activate first view
+	if (!activeView)
+		activeView = view;
 }
 
 /**
@@ -55,6 +58,9 @@ void Session::notifyViewRemoved( ViewPtr view )
  */
 void Session::notifyViewUpdated( ViewPtr view )
 {
+	// Do not send view update if view not active
+	if (activeView != view) return;
+
 	// Trigger view update
 	sendAction( "view/update", view->getUISpecs() );
 }
@@ -64,6 +70,10 @@ void Session::notifyViewUpdated( ViewPtr view )
  */
 void Session::notifyViewPropertyUpdate( ViewPtr view, PropertyPtr property )
 {
+	// Do not send view update if view not active
+	if (activeView != view) return;
+
+	// Set property update
 	Json::Value data;
 	data["id"] = view->id;
 	data["prop"] = property->id;
@@ -71,6 +81,17 @@ void Session::notifyViewPropertyUpdate( ViewPtr view, PropertyPtr property )
 
 	// Trigger view property change
 	sendAction( "view/propchange", data );
+}
+
+/**
+ * Send view property updates
+ */
+void Session::updateViewProperties( ViewPtr view )
+{
+	// Send updates to all view properties
+	for (auto it = view->propertyGroups.begin(); it != view->propertyGroups.end(); ++it)
+		for (auto jt = (*it).second->properties.begin(); jt != (*it).second->properties.end(); ++jt)
+			notifyViewPropertyUpdate( view, (*jt) );
 }
 
 /**
@@ -85,6 +106,18 @@ void Session::handleEvent( const string& id, const string& event, const Json::Va
 		for (auto it = kernel->views.begin(); it != kernel->views.end(); ++it) {
 			this->notifyViewAdded( *it );
 		}
+
+	} else if (event == "view/activate") {
+
+		// Require view property
+	    if (!data.isMember("view")) {
+	        sendError("Missing 'view' parameter in the incoming request", id);
+	        return;
+	    }
+
+		// Activate a specific view
+		activeView = kernel->getViewByID( data["view"].asString() );
+		updateViewProperties( activeView );
 
 	} else if (event == "property/event") {
 

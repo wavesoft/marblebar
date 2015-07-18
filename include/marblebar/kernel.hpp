@@ -78,6 +78,11 @@ namespace mb {
 		ViewPtr 					createView( const string & title = "" );
 
 		/**
+		 * Return view ptr
+		 */
+		ViewPtr						getViewByID( const string & id );
+
+		/**
 		 * Open browser and point to the GUI
 		 */
 		void 						openGUI();

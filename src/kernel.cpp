@@ -54,6 +54,19 @@ KernelPtr Kernel::addView( ViewPtr view )
 }
 
 /**
+ * Return view ptr
+ */
+ViewPtr	Kernel::getViewByID( const string & id )
+{
+	// Get view by ID
+	for (auto it = views.begin(); it != views.end(); ++it)
+		if ((*it)->id == id)
+			return (*it);
+	// Return empty view pointer
+	return ViewPtr();
+}
+
+/**
  * Create and store a new view with the specified ID
  */
 ViewPtr Kernel::createView( const string & title )

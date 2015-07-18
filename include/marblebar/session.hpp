@@ -79,9 +79,19 @@ namespace mb {
 	private:
 
 		/**
+		 * Update view propeties
+		 */
+		void 					updateViewProperties( ViewPtr view );
+
+		/**
 		 * Session kernel
 		 */
 		KernelPtr 				kernel;
+
+		/**
+		 * Active view
+		 */
+		ViewPtr					activeView;
 
 	};
 
