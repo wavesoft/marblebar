@@ -153,7 +153,7 @@ int Webserver::iterate_callback(struct mg_connection *conn, enum mg_event ev)
 {
 
     // Fetch 'this' from the connection server object
-    Webserver* self = static_cast<Webserver*>(conn->server_param);
+    Webserver* self = static_cast<Webserver*>(conn->callback_param);
 
     // Handle websockets
     if ((ev == MG_POLL) && conn->is_websocket) {
