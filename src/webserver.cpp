@@ -213,7 +213,7 @@ int Webserver::ev_handler(struct mg_connection *conn, enum mg_event ev)
  * Create a webserver and setup listening port
  */
 Webserver::Webserver( ConfigPtr config ) 
-    : config(config), staticResources(), connections(), activeConnection()
+    : config(config), staticResources(), connections(), activeConnection(), connMutex()
 {
 
 	// Create a mongoose server, passing the pointer
