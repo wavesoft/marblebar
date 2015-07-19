@@ -4,26 +4,28 @@
 MarbleBar.Widgets['button'] = MarbleBar.Widget.create(
 
 	// Constructor
-	function( hostDOM, specs ) {
+	function( hostDOM, inputID ) {
 
-		// Initialize widget
-		var id = MarbleBar.new_id();
-		this.label = $('<label class="col-sm-2 control-label" for="'+id+'"></label>').text( specs['meta']['title'] ).appendTo( hostDOM );
-		this.button = $('<button class="btn'+(specs['meta']['class'] || "")+'" id="'+id+'"></button>').appendTo(
-			$('<div class="col-sm-10"></div>').appendTo(hostDOM)
-		);
+		// Create input element and append to host DOM
+		this.elm = $('<button class="btn" id="'+inputID+'">Button</button>').appendTo(hostDOM);
 
-		// Click
-		this.button.click((function() {
-			this.trigger("click");
-		}).bind(this));
+		// Handle events
+		this.elm.click((function() { this.trigger("click"); }).bind(this));
+		this.elm.mousedown((function() { this.trigger("mousedown"); }).bind(this));
+		this.elm.mouseup((function() { this.trigger("mouseup"); }).bind(this));
 
 	},{
 
 		// Update widget value
 		update: function(value) {
 			// Update label's contents
-			this.button.html(value);
+			this.elm.html(value);
+		},
+
+		// Update widget specifications
+		updateSpecs: function(specs) {
+			// Update element class
+			this.elm.attr( "class", (specs['meta']['class'] || "") );
 		}
 
 	}
@@ -35,21 +37,28 @@ MarbleBar.Widgets['button'] = MarbleBar.Widget.create(
 MarbleBar.Widgets['label'] = MarbleBar.Widget.create(
 
 	// Constructor
-	function( hostDOM, specs ) {
+	function( hostDOM, inputID ) {
 
-		// Initialize widget
-		var id = MarbleBar.new_id();
-		this.label = $('<label class="col-sm-2 control-label" for="'+id+'"></label>').text( specs['meta']['title'] ).appendTo( hostDOM );
-		this.labelBody = $('<span id="'+id+'"></span>').appendTo(
-			$('<div class="col-sm-10"></div>').appendTo(hostDOM)
-		);
+		// Create element
+		this.elm = $('<span id="'+inputID+'"></span>').appendTo( hostDOM );
+
+		// Handle events
+		this.elm.click((function() { this.trigger("click"); }).bind(this));
+		this.elm.mousedown((function() { this.trigger("mousedown"); }).bind(this));
+		this.elm.mouseup((function() { this.trigger("mouseup"); }).bind(this));
 
 	},{
 
 		// Update widget value
 		update: function(value) {
 			// Update label's contents
-			this.labelBody.html(value);
+			this.elm.html(value);
+		},
+
+		// Update widget specifications
+		updateSpecs: function(specs) {
+			// Update element class
+			this.elm.attr( "class", (specs['meta']['class'] || "") );
 		}
 
 	}
@@ -61,27 +70,33 @@ MarbleBar.Widgets['label'] = MarbleBar.Widget.create(
 MarbleBar.Widgets['text'] = MarbleBar.Widget.create(
 
 	// Constructor
-	function( hostDOM, specs ) {
+	function( hostDOM, inputID ) {
 
-		// Initialize widget
-		var id = MarbleBar.new_id();
-		this.label = $('<label class="col-sm-2 control-label" for="'+id+'"></label>').text( specs['meta']['title'] ).appendTo( hostDOM );
-		this.input = $('<input class="form-control" id="'+id+'"></input>').appendTo(
-			$('<div class="col-sm-10"></div>').appendTo(hostDOM)
-		);
+		// Create element
+		this.elm = $('<input class="form-control" id="'+inputID+'"></input>').appendTo(hostDOM);
 
 		// Register updates
-		$(this.input).on("click blur keyup", (function() {
-			// Trigger value update
-			this.trigger("update", { "value": this.input.val() });
+		this.elm.on("click blur keyup", (function() {
+			this.trigger("update", { "value": this.elm.val() });
 		}).bind(this));
+
+		// Handle events
+		this.elm.click((function() { this.trigger("click"); }).bind(this));
+		this.elm.mousedown((function() { this.trigger("mousedown"); }).bind(this));
+		this.elm.mouseup((function() { this.trigger("mouseup"); }).bind(this));
 
 	}, {
 
 		// Update widget value
 		update: function(value) {
 			// Set to text field value
-			this.input.attr("value", value);
+			this.elm.attr("value", value);
+		},
+
+		// Update widget specifications
+		updateSpecs: function(specs) {
+			// Update element class
+			this.elm.attr( "class", (specs['meta']['class'] || "") );
 		}
 
 	}
@@ -94,28 +109,24 @@ MarbleBar.Widgets['text'] = MarbleBar.Widget.create(
 MarbleBar.Widgets['toggle'] = MarbleBar.Widget.create(
 
 	// Constructor
-	function( hostDOM, specs ) {
+	function( hostDOM, inputID ) {
 
 		// Initialize widget
-		var id = MarbleBar.new_id();
-		this.label = $('<label class="col-sm-2 control-label" for="'+id+'"></label>').text( specs['meta']['title'] ).appendTo( hostDOM );
-		this.btn = $('<button type="button" id="'+id+'" class="btn btn-danger">Off</button>').appendTo(
-			$('<div class="col-sm-10"></div>').appendTo(hostDOM)
-		);
+		this.elm = $('<button type="button" id="'+inputID+'" class="btn btn-danger">Off</button>').appendTo(hostDOM);
 
 		// Register updates
-		$(this.btn).on("click", (function() {
+		this.elm.on("click", (function() {
 
 			// Toggle class
-			if (this.btn.hasClass("btn-danger")) {
+			if (this.elm.hasClass("btn-danger")) {
 				this.trigger("update", { "value": true });
-				this.btn
+				this.elm
 					.removeClass("btn-danger")
 					.addClass("btn-success")
 					.text("On");
 			} else {
 				this.trigger("update", { "value": false });
-				this.btn
+				this.elm
 					.removeClass("btn-success")
 					.addClass("btn-danger")
 					.text("Off");
@@ -129,13 +140,13 @@ MarbleBar.Widgets['toggle'] = MarbleBar.Widget.create(
 		update: function(value) {
 			// Set or unset boolean field
 			if (value) {
-				this.btn
+				this.elm
 					.removeClass("btn-danger")
 					.addClass("btn-success")
 					.text("On");
 
 			} else {
-				this.btn
+				this.elm
 					.removeClass("btn-success")
 					.addClass("btn-danger")
 					.text("Off");
@@ -152,23 +163,13 @@ MarbleBar.Widgets['toggle'] = MarbleBar.Widget.create(
 MarbleBar.Widgets['slider'] = MarbleBar.Widget.create(
 
 	// Constructor
-	function( hostDOM, specs ) {
+	function( hostDOM, inputID ) {
 
 		// Initialize widget
-		var id = MarbleBar.new_id();
-		this.label = $('<label class="col-sm-2 control-label" for="'+id+'"></label>').text( specs['meta']['title'] ).appendTo( hostDOM );
-		this.input = $('<input id="'+id+'" type="text" />').appendTo(
-			$('<div class="col-sm-10"></div>').appendTo(hostDOM)
-		);
+		this.elm = $('<input id="'+inputID+'" type="text" />').appendTo(hostDOM);
 
-		// Create slider
-		$(this.input).slider({
-			'min': specs.meta.min || 0,
-			'max': specs.meta.max || 100,
-			'step': specs.meta.step || 1,
-			'value': specs.value
-		});
-		$(this.input).on("slide", (function(slideEvt) {
+		// Bind events
+		this.elm.on("slide", (function(slideEvt) {
 			this.trigger("update", { "value": slideEvt.value });
 		}).bind(this));
 
@@ -177,7 +178,18 @@ MarbleBar.Widgets['slider'] = MarbleBar.Widget.create(
 		// Update widget value
 		update: function(value) {
 			// Set slider value
-			this.input.slider('setValue', value);
+			this.elm.slider('setValue', value);
+		},
+
+		// Update widget specifications
+		updateSpecs: function(specs) {
+			// Create slider
+			this.elm.slider({
+				'min': specs.meta.min || 0,
+				'max': specs.meta.max || 100,
+				'step': specs.meta.step || 1,
+				'value': specs.value
+			});
 		}
 
 	}
@@ -190,27 +202,32 @@ MarbleBar.Widgets['slider'] = MarbleBar.Widget.create(
 MarbleBar.Widgets['image'] = MarbleBar.Widget.create(
 
 	// Constructor
-	function( hostDOM, specs ) {
+	function( hostDOM, inputID ) {
 
 		// Initialize widget
-		var id = MarbleBar.new_id();
-		this.label = $('<label class="col-sm-2 control-label" for="'+id+'"></label>').text( specs['meta']['title'] ).appendTo( hostDOM );
-		this.img = $('<img class="img-thumbnail" id="'+id+'" src="" />').appendTo(
-			$('<div class="col-sm-10"></div>').appendTo(hostDOM)
-		);
-
-		// Apply width/height if defined
-		if (specs.meta.width >= 0)
-			this.img.attr("width", specs.meta.width);
-		if (specs.meta.height >= 0)
-			this.img.attr("height", specs.meta.height);
+		this.elm = $('<img class="img-thumbnail" id="'+inputID+'" src="" />').appendTo(hostDOM);
 
 	}, {
 
 		// Update widget value
 		update: function(value) {
 			// Update image contents
-			this.img.attr('src', value);
+			this.elm.attr('src', value);
+		},
+
+		// Update widget specifications
+		updateSpecs: function(specs) {
+			// Apply width/height if defined
+			if (specs.meta.width >= 0) {
+				this.elm.attr("width", specs.meta.width);
+			} else {
+				this.elm.removeAttr("width");
+			}
+			if (specs.meta.height >= 0) {
+				this.elm.attr("height", specs.meta.height);
+			} else {
+				this.elm.removeAttr("height");
+			}
 		}
 
 	}

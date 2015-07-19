@@ -286,6 +286,12 @@
 	Widget.prototype.update = function(value) {
 	}
 
+	/**
+	 * Overridable function to update widget specs
+	 */
+	Widget.prototype.updateSpecs = function(value) {
+	}
+
 	////////////////////////////////////////////////
 	// Widget Repository
 	////////////////////////////////////////////////
@@ -360,8 +366,7 @@
 	View.prototype.createProperty = function( specs, host ) {
 
 		// Instance property from specs
-		var widget_CLASS = Widgets[specs.widget || "text"],
-			widgetDOM = $('<div class="form-group mb-property"></div>').appendTo( host );
+		var widget_CLASS = Widgets[specs.widget || "text"];
 
 		// Check for errors
 		if (!widget_CLASS) {
@@ -369,14 +374,25 @@
 			return;
 		}
 
+		// Widget template
+		var id = MarbleBar.new_id(),
+			h1 = $('<div class="form-group mb-property"></div>').appendTo( host )
+			h2 = $('<label class="col-sm-2 control-label" for="'+id+'"></label>').text(specs['meta'].title || "").appendTo(h1),
+			widgetDOM = $('<div class="col-sm-10"></div>').appendTo(h1);
+
 		// Create and initialize widget
-		var widget = new widget_CLASS( widgetDOM, specs );
+		var widget = new widget_CLASS( widgetDOM, id );
 		widget.view = this;
 		widget.id = specs.id;
 
 		// Store on index
 		this.propertyIndex[ specs.id ] = widget;
 		this.properties.push( widget );
+
+		// Apply specifications
+		try {
+			widget.updateSpecs( specs );
+		} catch (e) { }
 
 		// Apply value
 		try {
