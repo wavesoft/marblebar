@@ -100,7 +100,7 @@ Json::Value Property::getUISpecs()
 void Property::receiveUIEvent( const string & event, const Json::Value & data )
 {
 
-	// Forward to the
+	// Forward to the UI event handler of the property
 	handleUIEvent( event, data );
 
 	// Lookup listeners

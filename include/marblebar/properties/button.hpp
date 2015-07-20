@@ -18,8 +18,8 @@
  * Contact: <ioannis.charalampidis[at]cern.ch>
  */
 
-#ifndef _MARBLEBAR_PROP_STRING_HPP_
-#define _MARBLEBAR_PROP_STRING_HPP_
+#ifndef _MARBLEBAR_PROP_BUTTON_HPP_
+#define _MARBLEBAR_PROP_BUTTON_HPP_
 
 #include <json/json.h>
 #include <string>
@@ -33,20 +33,20 @@ using namespace std;
 namespace mb {
 
 	// Forward declarations
-	class PString;
-	typedef std::shared_ptr<PString> 	PStringPtr;
-	typedef std::weak_ptr<PString> 		PStringWeakPtr;
+	class PButton;
+	typedef std::shared_ptr<PButton> 	PButtonPtr;
+	typedef std::weak_ptr<PButton> 		PButtonWeakPtr;
 
 	/**
 	 * Property base class from which widgets can derrive
 	 */
-	class PString : public Property {
+	class PButton : public Property {
 	public:
 
 		/**
 		 * Initialize a MarbleBar property
 		 */
-		PString( const string & title, const string & defaultValue = "");
+		PButton( const string & title, const string & defaultValue = "");
 
 		/**
 		 * Overridable function to apply a property change to it's contents
@@ -73,17 +73,17 @@ namespace mb {
 		/**
 		 * Assign operator
 		 */
-		PString & operator= ( const string & str );
-		PString & operator= ( const char* str );
-		template<typename T> PString & operator= ( T num )
+		PButton & operator= ( const string & str );
+		PButton & operator= ( const char* str );
+		template<typename T> PButton & operator= ( T num )
 			{ value = std::to_string(num); this->markAsDirty(); return *this; }
 
 		/**
 		 * Append operator
 		 */
-		PString & operator+= ( const string & str );
-		PString & operator+= ( const char* str );
-		template<typename T> PString & operator+= ( T num )
+		PButton & operator+= ( const string & str );
+		PButton & operator+= ( const char* str );
+		template<typename T> PButton & operator+= ( T num )
 			{ value += std::to_string(num); this->markAsDirty(); return *this; }
 
 	private:
@@ -98,4 +98,4 @@ namespace mb {
 };
 
 
-#endif /* _MARBLEBAR_PROP_STRING_HPP_ */
+#endif /* _MARBLEBAR_PROP_BUTTON_HPP_ */

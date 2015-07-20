@@ -276,7 +276,7 @@
 			"view": this.view.id,
 			"prop": this.id,
 			"name": event,
-			"data": data
+			"data": data || {}
 		});
 	}
 

@@ -7,7 +7,7 @@ MarbleBar.Widgets['button'] = MarbleBar.Widget.create(
 	function( hostDOM, inputID ) {
 
 		// Create input element and append to host DOM
-		this.elm = $('<button class="btn" id="'+inputID+'">Button</button>').appendTo(hostDOM);
+		this.elm = $('<button type="button" class="btn" id="'+inputID+'">Button</button>').appendTo(hostDOM);
 
 		// Handle events
 		this.elm.click((function() { this.trigger("click"); }).bind(this));
@@ -25,7 +25,7 @@ MarbleBar.Widgets['button'] = MarbleBar.Widget.create(
 		// Update widget specifications
 		updateSpecs: function(specs) {
 			// Update element class
-			this.elm.attr( "class", (specs['meta']['class'] || "") );
+			this.elm.attr( "class", "btn "+(specs['meta']['class'] || "") );
 		}
 
 	}

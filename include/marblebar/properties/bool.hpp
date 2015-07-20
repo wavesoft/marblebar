@@ -18,8 +18,8 @@
  * Contact: <ioannis.charalampidis[at]cern.ch>
  */
 
-#ifndef _MARBLEBAR_PROP_STRING_HPP_
-#define _MARBLEBAR_PROP_STRING_HPP_
+#ifndef _MARBLEBAR_PROP_BOOL_HPP_
+#define _MARBLEBAR_PROP_BOOL_HPP_
 
 #include <json/json.h>
 #include <string>
@@ -88,4 +88,4 @@ namespace mb {
 };
 
 
-#endif /* _MARBLEBAR_PROP_STRING_HPP_ */
+#endif /* _MARBLEBAR_PROP_BOOL_HPP_ */

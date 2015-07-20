@@ -39,5 +39,6 @@
 #include <marblebar/properties/float.hpp>
 #include <marblebar/properties/double.hpp>
 #include <marblebar/properties/image.hpp>
+#include <marblebar/properties/button.hpp>
 
 #endif /* _MARBLEBAR_HPP_ */
