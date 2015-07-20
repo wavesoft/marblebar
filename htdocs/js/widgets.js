@@ -40,7 +40,7 @@ MarbleBar.Widgets['label'] = MarbleBar.Widget.create(
 	function( hostDOM, inputID ) {
 
 		// Create element
-		this.elm = $('<span id="'+inputID+'"></span>').appendTo( hostDOM );
+		this.elm = $('<span class="form-control" id="'+inputID+'"></span>').appendTo( hostDOM );
 
 		// Handle events
 		this.elm.click((function() { this.trigger("click"); }).bind(this));
@@ -58,7 +58,7 @@ MarbleBar.Widgets['label'] = MarbleBar.Widget.create(
 		// Update widget specifications
 		updateSpecs: function(specs) {
 			// Update element class
-			this.elm.attr( "class", (specs['meta']['class'] || "") );
+			this.elm.attr( "class", "form-control "+(specs['meta']['class'] || "") );
 		}
 
 	}
