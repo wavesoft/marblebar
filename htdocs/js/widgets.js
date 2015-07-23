@@ -1,4 +1,58 @@
 /**
+ * [list] A dropdown list widget
+ */
+MarbleBar.Widgets['list'] = MarbleBar.Widget.create(
+
+	// Constructor
+	function( hostDOM, inputID ) {
+
+		// Create input element and append to host DOM
+		this.elm = $('<select class="form-control" id="'+inputID+'"></select>').appendTo(hostDOM);
+
+		// Handle events
+		this.elm.click((function() { this.trigger("click"); }).bind(this));
+		this.elm.mousedown((function() { this.trigger("mousedown"); }).bind(this));
+		this.elm.mouseup((function() { this.trigger("mouseup"); }).bind(this));
+
+		// Flag to lock change events
+		this.lockUpdate = false;
+
+		// Register updates
+		this.elm.on("change", (function() {
+			if (this.lockUpdate) return;
+			this.trigger("update", { "index": this.elm[0].selectedIndex });
+		}).bind(this));
+
+	},{
+
+		// Update widget value
+		update: function(value) {
+			// Select appropriate index
+			this.elm.find(':nth-child('+(value+1)+')').prop('selected', true);
+		},
+
+		// Update widget specifications
+		updateSpecs: function(specs) {
+
+			// Keep index
+			var currIndex = this.elm[0].selectedIndex;
+
+			// Rebuild item options
+			this.elm.empty();
+			for (var i=0; i<specs.options.length; i++) {
+				$('<option></option>').text(specs.options[i][0]).appendTo(this.elm);
+			}
+
+			// Re-select without triggering 'update'
+			this.lockUpdate = true;
+			this.update( currIndex );
+			this.lockUpdate = false;
+
+		}
+
+	}
+);
+/**
  * [button] A clickable Widget
  */
 MarbleBar.Widgets['button'] = MarbleBar.Widget.create(

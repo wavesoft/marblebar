@@ -40,5 +40,6 @@
 #include <marblebar/properties/double.hpp>
 #include <marblebar/properties/image.hpp>
 #include <marblebar/properties/button.hpp>
+#include <marblebar/properties/list.hpp>
 
 #endif /* _MARBLEBAR_HPP_ */
